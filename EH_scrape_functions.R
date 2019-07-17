@@ -189,11 +189,14 @@ sc.scrape_schedule <- function(start_date, end_date, print_sched = TRUE) {
   while (!is.character(url_schedule) & try_count > 0) { 
     
     url_schedule <- try(
-      getURL(paste0("https://statsapi.web.nhl.com/api/v1/schedule?startDate=",
-                    as.character(start_date),
-                    "&endDate=",
-                    as.character(end_date)
-                    ))
+      getURL(
+        paste0(
+          "https://statsapi.web.nhl.com/api/v1/schedule?startDate=",
+          as.character(start_date),
+          "&endDate=",
+          as.character(end_date)
+          )
+        )
       )
     
     try_count <- try_count - 1
@@ -304,11 +307,13 @@ sc.scrape_events_HTM <- function(game_id_fun, season_id_fun, attempts = 3) {
     
     url_events_HTM <- try(
       getURL(
-        paste0("http://www.nhl.com/scores/htmlreports/",
-               as.character(season_id_fun),
-               "/PL0",
-               as.character(substr(game_id_fun, 6, 10)),
-               ".HTM")
+        paste0(
+          "http://www.nhl.com/scores/htmlreports/",
+          as.character(season_id_fun),
+          "/PL0",
+          as.character(substr(game_id_fun, 6, 10)),
+          ".HTM"
+          )
         )
       )
     
@@ -331,9 +336,11 @@ sc.scrape_events_API <- function(game_id_fun, attempts = 3) {
     
     url_events_API <- try(
       getURL(
-        paste0("https://statsapi.web.nhl.com/api/v1/game/", 
-               game_id_fun, 
-               "/feed/live?site=en_nhl")
+        paste0(
+          "https://statsapi.web.nhl.com/api/v1/game/", 
+          game_id_fun, 
+          "/feed/live?site=en_nhl"
+          )
         )
       )
     
@@ -379,11 +386,16 @@ sc.scrape_events_ESPN <- function(game_id_fun, season_id_fun, game_info_data, at
     
     url_ESPN_page <- try(
       getURL(
-        .opts = curlOptions(referer = "www.espn.com",
-                            verbose = FALSE,
-                            followLocation = TRUE), 
+        .opts = curlOptions(
+          referer = "www.espn.com",
+          verbose = FALSE,
+          followLocation = TRUE
+          ), 
         # url to scrape
-        paste0("http://www.espn.com/nhl/scoreboard?date=", gsub("-", "", as.character(game_info_data$game_date)))
+        paste0(
+          "http://www.espn.com/nhl/scoreboard?date=", 
+          gsub("-", "", as.character(game_info_data$game_date))
+          )
         )
       )
     
@@ -503,11 +515,13 @@ sc.scrape_shifts <- function(game_id_fun, season_id_fun, attempts = 3) {
     
     url_home_shifts <- try(
       getURL(
-        paste0("http://www.nhl.com/scores/htmlreports/", 
-               season_id_fun, 
-               "/TH0", 
-               as.character(substr(game_id_fun, 6, 10)), 
-               ".HTM")
+        paste0(
+          "http://www.nhl.com/scores/htmlreports/", 
+          season_id_fun, 
+          "/TH0", 
+          as.character(substr(game_id_fun, 6, 10)), 
+          ".HTM"
+          )
         )
       )
     
@@ -522,11 +536,13 @@ sc.scrape_shifts <- function(game_id_fun, season_id_fun, attempts = 3) {
     
     url_away_shifts <- try(
       getURL(
-        paste0("http://www.nhl.com/scores/htmlreports/", 
-               season_id_fun, 
-               "/TV0", 
-               as.character(substr(game_id_fun, 6, 10)), 
-               ".HTM")
+        paste0(
+          "http://www.nhl.com/scores/htmlreports/", 
+          season_id_fun, 
+          "/TV0", 
+          as.character(substr(game_id_fun, 6, 10)), 
+          ".HTM"
+          )
         )
       )
     
@@ -559,8 +575,10 @@ sc.scrape_shifts_API <- function(game_id_fun, attempts = 3) {
     
     url_shifts <- try(
       getURL(
-        paste0("http://www.nhl.com/stats/rest/shiftcharts?cayenneExp=gameId=", 
-               game_id_fun)
+        paste0(
+          "http://www.nhl.com/stats/rest/shiftcharts?cayenneExp=gameId=", 
+          game_id_fun
+          )
         )
       )
     
@@ -588,11 +606,13 @@ sc.scrape_rosters <- function(game_id_fun, season_id_fun, attempts = 3) {
     
     url_rosters <- try(
       getURL(
-        paste0("http://www.nhl.com/scores/htmlreports/",
-               as.character(season_id_fun),
-               "/RO0",
-               as.character(substr(game_id_fun, 6, 10)),
-               ".HTM")
+        paste0(
+          "http://www.nhl.com/scores/htmlreports/",
+          as.character(season_id_fun),
+          "/RO0",
+          as.character(substr(game_id_fun, 6, 10)),
+          ".HTM"
+          )
         )
       )
     
@@ -615,11 +635,13 @@ sc.scrape_event_summary <- function(game_id_fun, season_id_fun, attempts = 3) {
     
     url_event_summary <- try(
       getURL(
-        paste0("http://www.nhl.com/scores/htmlreports/",
-               as.character(season_id_fun),
-               "/ES0",
-               as.character(substr(game_id_fun, 6, 10)),
-               ".HTM")
+        paste0(
+          "http://www.nhl.com/scores/htmlreports/",
+          as.character(season_id_fun),
+          "/ES0",
+          as.character(substr(game_id_fun, 6, 10)),
+          ".HTM"
+          )
         )
       )
     
