@@ -1296,14 +1296,15 @@ sc.prepare_events_API <- function(game_id_fun, events_data_API, game_info_data) 
                game_period == 7 & game_info_data$session == "P" ~ game_seconds + 7200, 
                TRUE ~ game_seconds
                ), 
+           event_type = toupper(gsub("gamecenter", "", event_type)),  ## remove excessive "gamecenter" text and ensure capitalization
            event_type = 
              case_when(
-               event_type == "BLOCKED_SHOT" ~ "BLOCK", 
+               event_type == "BLOCKEDSHOT" ~ "BLOCK", 
                event_type == "FACEOFF" ~ "FAC", 
                event_type == "PENALTY" ~ "PENL", 
                event_type == "GIVEAWAY" ~ "GIVE", 
                event_type == "TAKEAWAY" ~ "TAKE", 
-               event_type == "MISSED_SHOT" ~ "MISS", 
+               event_type == "MISSEDSHOT" ~ "MISS", 
                TRUE ~ event_type
                )
            ) %>% 
@@ -1653,9 +1654,6 @@ sc.shifts_parse <- function(game_id_fun, season_id_fun, shifts_list, roster_data
   
   }
 
-
-
-
 # Shift Backup: Process API Source if HTM source fails
 sc.shifts_process_API <- function(game_id_fun, game_info_data) { 
   
@@ -1807,9 +1805,6 @@ sc.shifts_parse_API <- function(game_id_fun, shifts_list, roster_data, game_info
                       )
   
   }
-
-
-
 
 # Finalize Shifts Data (HTM or API source)
 sc.shifts_finalize <- function(game_id_fun, shifts_parse_data, events_data_HTM, game_info_data, fix_shifts) { 
