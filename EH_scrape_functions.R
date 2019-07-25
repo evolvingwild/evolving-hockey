@@ -3222,56 +3222,12 @@ sc.pbp_finalize <- function(pbp_data, on_data_home, on_data_away, roster_data, g
     data.frame()
   
   
-  ## Determine if x/y coordinates need to be "flipped"
-  flip_face <- pbp_combined %>% 
-    filter(
-      event_type == "FAC", 
-      event_zone %in% c("Off", "Def"), 
-      game_period %in% c(1, 2, 3)
-      ) %>% 
-    mutate(
-      home_zone = ifelse(event_team == away_team & event_zone == "Off", "Def", ifelse(event_team == away_team & event_zone == "Def", "Off", event_zone)), 
-      coords_x =  ifelse(coords_x < 0, -1, ifelse(coords_x > 0, 1, 0))
-      ) %>% 
-    group_by(game_id) %>% 
-    summarise(
-      home_team =  first(na.omit(home_team)), 
-      away_team =  first(na.omit(away_team)), 
-      home_o_1_3 = sum(na.omit(coords_x * (event_type == "FAC" & home_zone == "Off" & game_period %in% c(1, 3)))), 
-      home_d_1_3 = sum(na.omit(coords_x * (event_type == "FAC" & home_zone == "Def" & game_period %in% c(1, 3)))), 
-      home_o_2 =   sum(na.omit(coords_x * (event_type == "FAC" & home_zone == "Off" & game_period == 2))), 
-      home_d_2 =   sum(na.omit(coords_x * (event_type == "FAC" & home_zone == "Def" & game_period == 2)))
-      ) %>% 
-    ungroup() %>% 
-    mutate(
-      flip_o = 1 * (home_o_1_3 >= 0 & home_o_2 <= 0), 
-      flip_d = 1 * (home_d_1_3 <= 0 & home_d_2 >= 0), 
-      flip =   1 * (flip_o == 1 & flip_d == 1)
-      ) %>% 
-    data.frame()
-  
-  
-  ## Flip coordinates in pbp data where necessary
-  pbp_final <- pbp_combined %>% 
-    left_join(
-      flip_face %>% 
-        select(game_id, flip), 
-      by = "game_id"
-      ) %>% 
-    mutate(
-      coords_x = ifelse(flip == 1, coords_x * -1, coords_x), 
-      coords_y = ifelse(flip == 1, coords_y * -1, coords_y)
-      ) %>% 
-    select(-flip) %>% 
-    data.frame()
-  
-  
   
   ## Split into base and extra data to return
-  pbp_base <- pbp_final %>% 
+  pbp_base <- pbp_combined %>% 
     select(season:game_strength_state)
   
-  pbp_extras <- pbp_final %>% 
+  pbp_extras <- pbp_combined %>% 
     select(game_id, event_index, home_skaters_alt:event_description_alt)
   
   
