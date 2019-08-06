@@ -3865,8 +3865,10 @@ sc.player_info_API <- function(season_id_fun) {
     NHL_data_P$data
     ) %>% 
     group_by(
-      playerBirthCity, playerBirthCountry, playerBirthDate, playerBirthStateProvince, playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerFirstName, 
-      playerHeight, playerWeight, playerId, playerLastName, playerName, playerNationality, playerPositionCode, playerShootsCatches, seasonId
+      playerBirthCity, playerBirthCountry, playerBirthDate, playerBirthStateProvince, 
+      playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerFirstName, 
+      playerHeight, playerWeight, playerId, playerLastName, playerName, playerNationality, 
+      playerPositionCode, playerShootsCatches, seasonId
       ) %>% 
     summarise() %>% 
     data.frame()
@@ -3935,8 +3937,10 @@ sc.player_info_API <- function(season_id_fun) {
     NHL_goalie_data_P$data
     ) %>% 
     group_by(
-      playerBirthCity, playerBirthCountry, playerBirthDate, playerBirthStateProvince, playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerFirstName, 
-      playerHeight, playerWeight, playerId, playerLastName, playerName, playerNationality, playerPositionCode, playerShootsCatches, seasonId
+      playerBirthCity, playerBirthCountry, playerBirthDate, playerBirthStateProvince, 
+      playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerFirstName, 
+      playerHeight, playerWeight, playerId, playerLastName, playerName, playerNationality, 
+      playerPositionCode, playerShootsCatches, seasonId
       ) %>% 
     summarise() %>% 
     data.frame()
@@ -3993,7 +3997,7 @@ sc.player_info_API <- function(season_id_fun) {
       ) %>% 
     data.frame()
   
-  ## 
+  ## Verify no additional rows created from join
   if (sum(return_joined$check) > 0) { 
     warning("Multiple Players with Same Name 'player_upper' Name Present")
     break()
