@@ -1039,20 +1039,32 @@ sc.roster_info <- function(game_id_fun, season_id_fun, roster_data, game_info_da
       }
   
   
-  ## Construct roster data frame
+  ## Prepare & construct roster data frame
+  home_shifts_titles <- shifts_list$home_shifts_titles
+  away_shifts_titles <- shifts_list$away_shifts_titles
+  
+  if (game_id_fun == 2007030174) {  ## Manually remove Ryan Smyth from opposing team (one-off fix)
+    away_shifts_titles <- away_shifts_titles[which(!(away_shifts_titles %in% "94 SMYTH, RYAN"))]
+    
+    }
+  
   roster_df <- bind_rows(
     data.frame(
-      team_name =      shifts_list$home_shifts_titles[1],
+      # team_name =      shifts_list$home_shifts_titles[1],
+      team_name =      home_shifts_titles[1],
       Team =           game_info_data$home_team,
       venue =          "Home",
-      num_last_first = shifts_list$home_shifts_titles[-1], 
+      # num_last_first = shifts_list$home_shifts_titles[-1], 
+      num_last_first = home_shifts_titles[-1], 
       stringsAsFactors = FALSE
       ),
     data.frame(
-      team_name =      shifts_list$away_shifts_titles[1],
+      # team_name =      shifts_list$away_shifts_titles[1],
+      team_name =      away_shifts_titles[1],
       Team =           game_info_data$away_team,
       venue =          "Away",
-      num_last_first = shifts_list$away_shifts_titles[-1], 
+      # num_last_first = shifts_list$away_shifts_titles[-1], 
+      num_last_first = away_shifts_titles[-1], 
       stringsAsFactors = FALSE
       )
     ) %>%
@@ -1612,8 +1624,8 @@ sc.shifts_parse <- function(game_id_fun, season_id_fun, shifts_list, roster_data
       mutate(
         shift_end = 
           suppressWarnings(case_when(
-            ## Force end of period when shift end is before shift start (and start is within 2 minutes of period end)
-            position != "G" & as.numeric(str_extract(duration, "^[0-9]+")) > 30 & as.numeric(str_extract(shift_start, "^[0-9]+")) >= 18 & 
+            ## Force end of period when shift end is before shift start (and start is within 3 minutes of period end)
+            position != "G" & as.numeric(str_extract(duration, "^[0-9]+")) > 30 & as.numeric(str_extract(shift_start, "^[0-9]+")) >= 17 & 
               (as.numeric(game_period) <= 3 | game_info_data$session == "P") ~ 
               "20:00 / 0:00", 
             
@@ -1622,7 +1634,7 @@ sc.shifts_parse <- function(game_id_fun, season_id_fun, shifts_list, roster_data
         shift_mod = 
           ## Indicate if shift was modified
           suppressWarnings(ifelse(
-            position != "G" & as.numeric(str_extract(duration, "^[0-9]+")) > 30 & as.numeric(str_extract(shift_start, "^[0-9]+")) >= 18 & 
+            position != "G" & as.numeric(str_extract(duration, "^[0-9]+")) > 30 & as.numeric(str_extract(shift_start, "^[0-9]+")) >= 17 & 
               (as.numeric(game_period) <= 3 | game_info_data$session == "P"), 
             1, 0
             ))
@@ -3731,8 +3743,6 @@ sc.scrape_pbp <- function(games, scrape_type = "full", live_scrape = FALSE, verb
 ##   Additional Data Functions   ##
 ## ----------------------------- ##
 
-## Note: these are not essential to running the sc.scrape_pbp() function
-
 ## Fix Player Names - API
 sc.update_names_API <- function(data, col_name) { 
   
@@ -3829,8 +3839,8 @@ sc.player_info_API <- function(season_id_fun) {
   ##   Skater Data   ##
   ## --------------- ##
   
-  ## Scrape NHL JSON data
-  NHL_data <- jsonlite::fromJSON(
+  ## Regular Season
+  NHL_data_R <- jsonlite::fromJSON(
     paste0(
       "http://www.nhl.com/stats/rest/skaters?isAggregate=false&reportType=basic&isGame=false&reportName=bios&cayenneExp=gameTypeId=2%20and%20seasonId%3E=", 
       season_id_fun, 
@@ -3839,29 +3849,55 @@ sc.player_info_API <- function(season_id_fun) {
       )
     )
   
-  ## Skater data per season
-  NHL_skater_data <- NHL_data$data %>% 
+  ## Playoffs
+  NHL_data_P <- jsonlite::fromJSON(
+    paste0(
+      "http://www.nhl.com/stats/rest/skaters?isAggregate=false&reportType=basic&isGame=false&reportName=bios&cayenneExp=gameTypeId=3%20and%20seasonId%3E=", 
+      season_id_fun, 
+      "%20and%20seasonId%3C=", 
+      season_id_fun
+      )
+    )
+  
+  ## Bind
+  NHL_data <- bind_rows(
+    NHL_data_R$data, 
+    NHL_data_P$data
+    ) %>% 
+    group_by(
+      playerBirthCity, playerBirthCountry, playerBirthDate, playerBirthStateProvince, playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerFirstName, 
+      playerHeight, playerWeight, playerId, playerLastName, playerName, playerNationality, playerPositionCode, playerShootsCatches, seasonId
+      ) %>% 
+    summarise() %>% 
+    data.frame()
+    
+      
+  ## Process skater data per season
+  NHL_skater_data <- NHL_data %>% 
     mutate(
-      player =               toupper(playerName), 
-      player =               gsub(" ", ".", player), 
-      birthday =             as.Date(playerBirthDate), 
-      season_age =           as.numeric(floor((as.Date(paste0(substr(seasonId, 5, 8), "-2-15"), "%Y-%m-%d") - birthday) / 365.25)), 
-      seasonId =             as.character(seasonId), 
-      playerTeamsPlayedFor = ifelse(grepl(", ", playerTeamsPlayedFor), gsub(", ", "/", playerTeamsPlayedFor), playerTeamsPlayedFor)
+      player =     toupper(playerName), 
+      player =     gsub(" ", ".", player), 
+      birthday =   as.Date(playerBirthDate), 
+      # season_age = as.numeric(floor((as.Date(paste0(substr(seasonId, 5, 8), "-2-15"), "%Y-%m-%d") - birthday) / 365.25)), 
+      season_age = as.numeric(floor((as.Date(paste0(substr(seasonId, 1, 4), "-9-15"), "%Y-%m-%d") - birthday) / 365.25)),    ## age in line with CBA definition
+      seasonId =   as.character(seasonId)#, 
+      #playerTeamsPlayedFor = ifelse(grepl(", ", playerTeamsPlayedFor), gsub(", ", "/", playerTeamsPlayedFor), playerTeamsPlayedFor)
       ) %>% 
     rename(season = seasonId) %>% 
     ungroup() %>% 
     rename_at(
-      vars(playerPositionCode, playerShootsCatches, playerBirthCity, playerBirthCountry, playerTeamsPlayedFor, 
-           playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerHeight, playerWeight), 
+      vars(
+        playerPositionCode, playerShootsCatches, playerBirthCity, playerBirthCountry, # playerTeamsPlayedFor, 
+        playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerHeight, playerWeight
+        ), 
       funs(gsub("player", "", .))
       ) %>%  
     mutate(
-      position =    ifelse(PositionCode == "D", 2, 1),
-      current_age = floor((Sys.Date() - birthday) / 365.25)
+      position_type = ifelse(PositionCode == "D", "D", "F"),
+      current_age =   floor((Sys.Date() - birthday) / 365.25)
       ) %>% 
     select(
-      player, NHL_ID = playerId, position, PositionCode, ShootsCatches, birthday, TeamsPlayedFor, 
+      player, NHL_ID = playerId, position = PositionCode, position_type, ShootsCatches, birthday, # TeamsPlayedFor, 
       BirthCity, BirthCountry, DraftOverallPickNo, DraftRoundNo, 
       DraftYear, Height, Weight, 
       season, season_age, current_age
@@ -3873,8 +3909,8 @@ sc.player_info_API <- function(season_id_fun) {
   ##   Goalie Data   ##
   ## --------------- ##
   
-  ## Scrape NHL JSON data
-  NHL_goalie_data <- jsonlite::fromJSON(
+  ## Regular Season
+  NHL_goalie_data_R <- jsonlite::fromJSON(
     paste0(
       "http://www.nhl.com/stats/rest/goalies?isAggregate=false&reportType=basic&isGame=false&reportName=bios&cayenneExp=gameTypeId=2%20and%20seasonId%3E=", 
       season_id_fun, 
@@ -3883,29 +3919,55 @@ sc.player_info_API <- function(season_id_fun) {
       )
     )
   
+  ## Playoffs
+  NHL_goalie_data_P <- jsonlite::fromJSON(
+    paste0(
+      "http://www.nhl.com/stats/rest/goalies?isAggregate=false&reportType=basic&isGame=false&reportName=bios&cayenneExp=gameTypeId=3%20and%20seasonId%3E=", 
+      season_id_fun, 
+      "%20and%20seasonId%3C=", 
+      season_id_fun
+      )
+    )
+  
+  ## Bind
+  NHL_goalie_data <- bind_rows(
+    NHL_goalie_data_R$data, 
+    NHL_goalie_data_P$data
+    ) %>% 
+    group_by(
+      playerBirthCity, playerBirthCountry, playerBirthDate, playerBirthStateProvince, playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerFirstName, 
+      playerHeight, playerWeight, playerId, playerLastName, playerName, playerNationality, playerPositionCode, playerShootsCatches, seasonId
+      ) %>% 
+    summarise() %>% 
+    data.frame()
+  
+  
   ## Goalie data per season
-  NHL_goalie_data <- NHL_goalie_data$data %>% 
+  NHL_goalie_data <- NHL_goalie_data %>% 
     mutate(
-      player =               toupper(playerName), 
-      player =               gsub(" ", ".", player), 
-      birthday =             as.Date(playerBirthDate), 
-      season_age =           as.numeric(floor((as.Date(paste0(substr(seasonId, 5, 8), "-2-15"), "%Y-%m-%d") - birthday) / 365.25)), 
-      seasonId =             as.character(seasonId), 
-      playerTeamsPlayedFor = ifelse(grepl(", ", playerTeamsPlayedFor), gsub(", ", "/", playerTeamsPlayedFor), playerTeamsPlayedFor)
+      player =     toupper(playerName), 
+      player =     gsub(" ", ".", player), 
+      birthday =   as.Date(playerBirthDate), 
+      # season_age = as.numeric(floor((as.Date(paste0(substr(seasonId, 5, 8), "-2-15"), "%Y-%m-%d") - birthday) / 365.25)), 
+      season_age = as.numeric(floor((as.Date(paste0(substr(seasonId, 1, 4), "-9-15"), "%Y-%m-%d") - birthday) / 365.25)),    ## age in line with CBA definition
+      seasonId =   as.character(seasonId)#, 
+      # playerTeamsPlayedFor = ifelse(grepl(", ", playerTeamsPlayedFor), gsub(", ", "/", playerTeamsPlayedFor), playerTeamsPlayedFor)
       ) %>% 
     rename(season = seasonId) %>% 
     ungroup() %>% 
     rename_at(
-      vars(playerPositionCode, playerShootsCatches, playerBirthCity, playerBirthCountry, playerTeamsPlayedFor, 
-           playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerHeight, playerWeight), 
+      vars(
+        playerPositionCode, playerShootsCatches, playerBirthCity, playerBirthCountry, #playerTeamsPlayedFor, 
+        playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerHeight, playerWeight
+        ), 
       funs(gsub("player", "", .))
       ) %>% 
     mutate(
-      position =    3,
-      current_age = floor((Sys.Date() - birthday) / 365.25)
+      position_type = "G",
+      current_age =   floor((Sys.Date() - birthday) / 365.25)
       ) %>% 
     select(
-      player, NHL_ID = playerId, position, PositionCode, ShootsCatches, birthday, TeamsPlayedFor, 
+      player, NHL_ID = playerId, position = PositionCode, position_type, ShootsCatches, birthday, # TeamsPlayedFor, 
       BirthCity, BirthCountry, DraftOverallPickNo, DraftRoundNo, 
       DraftYear, Height, Weight, 
       season, season_age, current_age
@@ -3919,20 +3981,39 @@ sc.player_info_API <- function(season_id_fun) {
     NHL_goalie_data
     ) %>% 
     ## Name Corrections
-    sc.update_names_API(., col_name = "player") %>% 
+    sc.update_names_API(data = ., col_name = "player") %>% 
+    select(
+      player, NHL_ID, birthday, season_age, current_age, position, position_type, ShootsCatches, season, 
+      everything()
+      ) %>% 
     arrange(player) %>% 
+    mutate(
+      check = 1 * (player == lag(player)), 
+      check = ifelse(is.na(check), 0, check)
+      ) %>% 
     data.frame()
+  
+  ## 
+  if (sum(return_joined$check) > 0) { 
+    warning("Multiple Players with Same Name 'player_upper' Name Present")
+    break()
+    }
   
   
   ## Ensure database friendly column names
   colnames(return_joined) <- tolower(colnames(return_joined))
   
-  
-  return(return_joined)
+  return(
+    return_joined %>% 
+      select(-check)
+    )
   
   }
 
-## Scrape & Process Player Names Only (from HTM shifts source)
+
+
+
+## Scrape & Process Player Names Only (from HTM shifts source)  *** Non Essential ***
 sc.get_names_combine <- function(games_vec) { 
   
   ## Get names function (from html shifts data)
