@@ -710,7 +710,13 @@ sc.game_info <- function(game_id_fun, season_id_fun, events_data, roster_data) {
     game_id =         game_id_fun, 
     season =          season_id_fun, 
     game_date =       first(roster_data[grep("^[a-zA-Z]*, ", roster_data)]) %>% gsub("^[a-zA-Z]*, ", "", .) %>% as.Date(., format = "%B %d, %Y") %>% as.character(), 
-    session =         ifelse(as.character(substr(game_id_fun, 6, 10)) > 30000, "P", "R"), 
+    # session =         ifelse(as.character(substr(game_id_fun, 6, 10)) > 30000, "P", "R"), 
+    session = 
+      case_when(
+        as.character(substr(game_id_fun, 6, 10)) > 20000 & as.character(substr(game_id_fun, 6, 10)) < 30000  ~ "R", 
+        as.character(substr(game_id_fun, 6, 10)) > 30000 ~ "P", 
+        as.character(substr(game_id_fun, 6, 10)) < 20000 ~ "PS"
+        ), 
     game_time_start = first(na.omit(str_extract(roster_data, "[sS]tart\\s*[0-9]+:[0-9]+\\s*[A-Z]+"))) %>% gsub("[sS]tart\\s*", "", .), 
     game_time_end =   first(na.omit(str_extract(roster_data, "[eE]nd\\s*[0-9]+:[0-9]+\\s*[A-Z]+"))) %>% gsub("[eE]nd\\s*", "", .), 
     venue =           venue_vec, 
@@ -1425,12 +1431,15 @@ sc.prepare_events_API <- function(game_id_fun, events_data_API, game_info_data) 
       event_type = toupper(gsub("gamecenter", "", event_type)),  ## remove excessive "gamecenter" text and ensure capitalization
       event_type = 
         case_when(
+          ## Update API event type names
           event_type == "BLOCKEDSHOT" ~ "BLOCK", 
+          event_type == "BLOCKED_SHOT" ~ "BLOCK", 
+          event_type == "MISSEDSHOT" ~ "MISS", 
+          event_type == "MISSED_SHOT" ~ "MISS", 
           event_type == "FACEOFF" ~ "FAC", 
           event_type == "PENALTY" ~ "PENL", 
           event_type == "GIVEAWAY" ~ "GIVE", 
           event_type == "TAKEAWAY" ~ "TAKE", 
-          event_type == "MISSEDSHOT" ~ "MISS", 
           TRUE ~ event_type
           )
       ) %>% 
@@ -3807,6 +3816,9 @@ sc.update_names_API <- function(data, col_name) {
           player_name == "TOBY.ENSTROM" ~ "TOBIAS.ENSTROM",  
           player_name == "TREVOR.VAN.RIEMSDYK" ~ "TREVOR.VAN RIEMSDYK", 
           player_name == "ZACK.FITZGERALD" ~ "ZACH.FITZGERALD", 
+          
+          ## New changes
+          player_name == "TIM.GETTINGER" ~ "TIMOTHY.GETTINGER", 
           
           ## Duplicate player names
           player_name == "SEBASTIAN.AHO" & birthday == "1996-02-17" ~ "SEBASTIAN.AHO2",     ## D, ID 8480222
