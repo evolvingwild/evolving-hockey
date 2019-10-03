@@ -3012,11 +3012,12 @@ sc.pbp_combine <- function(events_data, shifts_data, roster_data, game_info_data
         1 * (event_type %in% c("TAKE", "GIVE", "MISS", "HIT", "SHOT", "BLOCK") & !(game_period == 5 & session == "R")) +
         2 * (event_type == "GOAL" & !(game_period == 5 & session == "R")) +
         3 * (event_type == "STOP" & !(game_period == 5 & session == "R")) +
-        4 * (event_type == "PENL" & !(game_period == 5 & session == "R")) +
-        5 * (event_type == "CHANGE" & !(game_period == 5 & session == "R")) +
-        6 * (event_type == "PEND" & !(game_period == 5 & session == "R")) +
-        7 * (event_type == "GEND" & !(game_period == 5 & session == "R")) +
-        8 * (event_type == "FAC" &  !(game_period == 5 & session == "R"))
+        4 * (event_type == "DELPEN" & !(game_period == 5 & session == "R")) +  ## new DELPEN event comes before PENL event
+        5 * (event_type == "PENL" & !(game_period == 5 & session == "R")) +
+        6 * (event_type == "CHANGE" & !(game_period == 5 & session == "R")) +
+        7 * (event_type == "PEND" & !(game_period == 5 & session == "R")) +
+        8 * (event_type == "GEND" & !(game_period == 5 & session == "R")) +
+        9 * (event_type == "FAC" &  !(game_period == 5 & session == "R"))
       ) %>% 
     arrange(
       game_period, 
@@ -3700,9 +3701,11 @@ sc.scrape_pbp <- function(games, scrape_type = "full", live_scrape = FALSE, verb
   
   ## Print results
   cat("-------------", "\n", 
-      paste0(length(unique(new_roster_df$game_id)), " of ", length(games_vec), 
-             " games returned // Avg Time Per Game: ", 
-             round(mean(scrape_report_df$time_elapsed), 1), "\n")
+      paste0(
+        length(unique(new_roster_df$game_id)), " of ", length(games_vec), 
+        " games returned // Avg Time Per Game: ", 
+        round(mean(scrape_report_df$time_elapsed), 1), "\n"
+        )
       )
   
   
