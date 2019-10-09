@@ -1382,19 +1382,23 @@ sc.prepare_events_API <- function(game_id_fun, events_data_API, game_info_data) 
   ## Parse API events data
   events_join_API_raw <- 
     bind_cols(
-      events_data_API$liveData$plays$allPlays$about %>% select(-goals), 
-      events_data_API$liveData$plays$allPlays$about$goals %>% rename(away.goals = away, home.goals = home) 
+      events_data_API$liveData$plays$allPlays$about %>% 
+        select(-goals), 
+      events_data_API$liveData$plays$allPlays$about$goals %>% 
+        rename(
+          away.goals = away, 
+          home.goals = home
+          ) 
       ) %>% 
     mutate(eventIdx = eventIdx + 1) %>% 
     left_join(
-      bind_cols(
-        events_data_API$liveData$plays$allPlays$result %>% select(-strength), 
-        events_data_API$liveData$plays$allPlays$result$strength %>% rename(strength.code = code, strength.name = name)) %>% 
+      events_data_API$liveData$plays$allPlays$result %>%  ## removed separate parsing of "strength" endpoint
         mutate(eventIdx = row_number()), 
       by = "eventIdx"
       ) %>% 
     left_join( 
-      events_data_API$liveData$plays$allPlays$coordinates %>% mutate(eventIdx = row_number()), 
+      events_data_API$liveData$plays$allPlays$coordinates %>% 
+        mutate(eventIdx = row_number()), 
       by = "eventIdx"
       ) %>% 
     left_join(
@@ -1402,7 +1406,8 @@ sc.prepare_events_API <- function(game_id_fun, events_data_API, game_info_data) 
         mutate(
           triCode =  Team_ID$Team[match(id, Team_ID$ID)], ## use HTM source team triCodes
           eventIdx = row_number()
-          ), 
+          ) %>% 
+        rename(teamName = name), 
       by = "eventIdx"
       ) %>% 
     select(
