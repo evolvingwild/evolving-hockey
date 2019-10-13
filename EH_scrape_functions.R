@@ -1329,7 +1329,7 @@ sc.prepare_events_HTM <- function(game_id_fun, season_id_fun, events_data, game_
     mutate(
       event_description = gsub("\\bPHX\\b", "ARI", event_description),   ## change PHX to ARI in event description
       
-      event_team = ifelse(event_type %in% c(sc.main_events, "CHL"), str_extract(event_description, "^[A-Z]\\.[A-Z]|^[A-Z]+"), NA), 
+      event_team = ifelse(event_type %in% c(sc.main_events, "CHL", "DELPEN"), str_extract(event_description, "^[A-Z]\\.[A-Z]|^[A-Z]+"), NA), 
       event_team = ifelse(!event_team %in% Team_ID_vec, NA, event_team),  ## ensure event_team extacted is an actual team
       
       event_player_1 = 
