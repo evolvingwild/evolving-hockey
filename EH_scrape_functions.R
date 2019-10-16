@@ -2367,10 +2367,40 @@ sc.shifts_finalize <- function(game_id_fun, shifts_parse_data, events_data_HTM, 
         shifts_raw <- shifts_parsed
         }
     
+    
+    
     } else {
       shifts_raw <- shifts_parsed
     
       }
+  
+  
+  ## ----------------------------------- ##
+  ##   Manual Goalie Shift Corrections   ##
+  ## ----------------------------------- ##
+  
+  if (game_id_fun == "2019020019") { 
+    
+    ## Pull out problematic goalie shifts
+    manual_goalie_shift <- shifts_raw %>% 
+      filter(player == "MICHAEL.HUTCHINSON")
+    
+    manual_goalie_shift <- bind_rows(manual_goalie_shift, manual_goalie_shift[4, ])
+    
+    manual_goalie_shift[, "game_period"] <-   c(1, 2, 3, 3, 4)
+    manual_goalie_shift[, "seconds_start"] <- c(0,    1200, 2400, 3525, 3600) ## 2400 + as.numeric(seconds(ms("18:45")))
+    manual_goalie_shift[, "seconds_end"] <-   c(1200, 2400, 3517, 3600, 3900) ## 2400 + as.numeric(seconds(ms("18:37")))
+    
+    ## Combine with all shifts
+    shifts_raw <- bind_rows(
+      shifts_raw %>% 
+        filter(player != "MICHAEL.HUTCHINSON"), 
+      manual_goalie_shift
+      ) %>% 
+      arrange(seconds_start, event_team)
+    
+    }
+  
   
   
   ## ---------------------- ##
