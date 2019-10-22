@@ -3183,7 +3183,7 @@ sc.pbp_combine <- function(events_data, shifts_data, roster_data, game_info_data
   }
 
 ## Finalize PBP Data
-sc.pbp_finalize <- function(pbp_data, on_data_home, on_data_away, roster_data, game_info_data) { 
+sc.pbp_finalize <- function(pbp_data, on_data_home, on_data_away, roster_data, game_info_data, live_scrape) { 
   
   ## Create vectors to be used below
   skater_vec_home <- as.character(filter(roster_data, position_type != "G", Team == game_info_data$home_team)$player)
@@ -3278,6 +3278,13 @@ sc.pbp_finalize <- function(pbp_data, on_data_home, on_data_away, roster_data, g
     arrange(game_id, event_index) %>% 
     data.frame()
   
+  
+  ## Use alternate strength state if game is in progress
+  if (live_scrape == TRUE) { 
+    pbp_combined <- pbp_combined %>% 
+      mutate(game_strength_state = game_strength_state_alt)
+    
+    }
   
   
   ## Split into base and extra data to return
@@ -3548,7 +3555,8 @@ sc.scrape_game <- function(game_id, season_id, scrape_type_, live_scrape_) {
       on_data_home =   pbp_combine_list$is_on_df_home, 
       on_data_away =   pbp_combine_list$is_on_df_away, 
       roster_data =    rosters_list$roster_df, 
-      game_info_data = game_info_df
+      game_info_data = game_info_df, 
+      live_scrape = live_scrape_
       )
     
     ## Modify game_info_df to return
