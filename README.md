@@ -12,6 +12,16 @@ The `sc.scrape_pbp` function is used to scrape one or more games from the NHL's 
 Example:
 
 ``` {r}
+
+## Dependencies
+library(RCurl); library(xml2); library(rvest); library(jsonlite); library(foreach)
+library(lubridate)
+library(tidyverse) -- specifically: stringr, readr, tidyr, and dplyr
+
+## Source scraper functions from GitHub
+devtools::source_url("https://raw.githubusercontent.com/evolvingwild/evolving-hockey/master/EH_scrape_functions.R")
+
+## Scrape games
 pbp_scrape <- sc.scrape_pbp(games = c("2018020001", "2018020002"))
 
 ```
