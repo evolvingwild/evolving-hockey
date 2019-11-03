@@ -1,5 +1,3 @@
-## evolving-hockey
-
 Scripts for <a href="https://evolving-hockey.com/" target="_blank">Evolving-Hockey.com</a>
 
   + EH_scrape_functions.R is an NHL scraper we have written that is currently in beta testing.
@@ -18,14 +16,11 @@ pbp_scrape <- sc.scrape_pbp(games = c("2018020001", "2018020002"))
 
 ```
 
-<br>
-
 #### Function Arguments
 
 games:
 - a vector of full NHL game IDs (one or more may be provided)
 - example: 2018020001
-
 
 scrape_type:
 - "full": all data returned
@@ -33,25 +28,20 @@ scrape_type:
 - "rosters": only rosters and scratches information returned
 - default is "full"
 
-
 live_scrape:
 - FALSE = function adjusts incorrect player & goalie shifts
 - TRUE = function does not adjust incorrect player & goalie shifts (this should be used when scraping games that are in progress)
 - default is FALSE
 
-
 verbose:
 - TRUE = print the system time for each game scraped
 - default is TRUE
-
 
 sleep:
 - time to wait between each game being scraped (in seconds)
 - default is 0
 
-
 <br>
-
 
 ### Full Scrape Example:
 
