@@ -134,7 +134,9 @@ ds.get_shifts <- function(season, game_id, venue, source, try_tolerance = 3, age
                    )
       
       
-      } else if(tolower(venue) == "away") {
+      } 
+    
+    else if(tolower(venue) == "away") {
       
       url <- paste("http://www.nhl.com/scores/htmlreports/", 
                    season, 
@@ -175,7 +177,9 @@ ds.get_shifts <- function(season, game_id, venue, source, try_tolerance = 3, age
     
     return(shifts_list)
     
-    } else if(tolower(source) == "json") {
+    } 
+  
+  else if(tolower(source) == "json") {
     
     year <- substr(season, 0, 4)
     
@@ -216,6 +220,7 @@ ds.get_shifts <- function(season, game_id, venue, source, try_tolerance = 3, age
     return(raw_json)
     
     }
+  
   }
 
 # Get Roster
@@ -1305,8 +1310,8 @@ ds.scrape_game <- function(season, game_id, try_tolerance = 3, agents = "Mozilla
                   "", 
                   roster_df$num_first_last
                   ), 
-    ", "
-    ) %>%
+             ", "
+             ) %>%
       unlist() %>%
       as.character() %>%
       matrix(ncol = 2,

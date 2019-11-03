@@ -15,6 +15,11 @@ options(scipen = 999)
 set.seed(123)
 
 
+
+install.packages("foreach")
+
+
+
 ###  Load Object Data
 #####################################
 
@@ -207,6 +212,9 @@ schedule_current <- fun.schedule(Sys.Date() - 1,
 
 print(schedule_current)
 
+schedule_current <- schedule_current_1819 %>% 
+  filter(game_status != "Scheduled")
+
 
 # Scrape pbp data
 fun.scrape_pbp <- function(year) { 
@@ -307,9 +315,17 @@ player_position <- player_position_historic %>%
   select(-c(test)) %>% 
   
   ##        ***  Manual Addition  ***            ##
-  #rbind(., data.frame(player = "CALVIN.PETERSEN", 
+  # rbind(., data.frame(player = "CALVIN.PETERSEN",
   #                    position = 3)
-  #      ) %>% 
+  #      ) %>%
+  
+  bind_rows(
+    data.frame(
+      player = c("ALEKSI.SAARELA", "CALE.MAKAR", "VLADISLAV.GAVRIKOV"),
+      position = c(1, 2, 2), 
+      stringsAsFactors = FALSE
+      )
+    ) %>%
   
   arrange(player) %>% 
   data.frame()
@@ -757,6 +773,14 @@ goalie_games_all_sit_new <- fun.goalie_games(data = pbp_df)
 
 # Run Functions
 pen_source <- fun.pen_setup(data = pbp_df)
+
+# Manual Fix for EN to 4v4 penalties
+# pen_source <- fun.pen_setup(data = pbp_df %>%
+#                               mutate(game_strength_state = ifelse(game_id == "2018021179" & event_index == 292 & event_type == "PENL", "5v5", game_strength_state),
+#                                      game_strength_state = ifelse(game_id == "2018021179" & event_index == 293 & event_type == "PENL", "5v5", game_strength_state)
+#                                      )
+#                             )
+
 pen_enhanced <- fun.pen_assign(data = pen_source)
 pen_calc_main <- fun.pen_value_main(pen_data = pen_enhanced, pbp_data = pbp_df)
 pen_calc_xtras <- fun.pen_value_xtra(data = pen_enhanced)
@@ -924,6 +948,51 @@ fun.check_new_games <- function() {
   
   }
 check_new_games <- fun.check_new_games()
+
+
+
+
+# pbp_joined <- pbp_df
+# 
+# games_all_sit_joined <- games_all_sit_new
+# games_EV_joined <-      games_EV_new
+# games_PP_joined <-      games_PP_new
+# games_SH_joined <-      games_SH_new
+# games_5v5_joined <-     games_5v5_new
+# games_4v4_joined <-     games_4v4_new
+# games_3v3_joined <-     games_3v3_new
+# games_5v4_joined <-     games_5v4_new
+# games_5v3_joined <-     games_5v3_new
+# games_4v3_joined <-     games_4v3_new
+# games_4v5_joined <-     games_4v5_new
+# games_3v5_joined <-     games_3v5_new
+# games_3v4_joined <-     games_3v4_new
+# 
+# team_games_all_sit_joined <- team_games_all_sit_new
+# team_games_EV_joined <-      team_games_EV_new
+# team_games_PP_joined <-      team_games_PP_new
+# team_games_SH_joined <-      team_games_SH_new
+# team_games_5v5_joined <-     team_games_5v5_new
+# team_games_4v4_joined <-     team_games_4v4_new
+# team_games_3v3_joined <-     team_games_3v3_new
+# team_games_5v4_joined <-     team_games_5v4_new
+# team_games_5v3_joined <-     team_games_5v3_new
+# team_games_4v3_joined <-     team_games_4v3_new
+# team_games_4v5_joined <-     team_games_4v5_new
+# team_games_3v5_joined <-     team_games_3v5_new
+# team_games_3v4_joined <-     team_games_3v4_new
+# 
+# TOI_together_EV_joined <-  teammate_TOI_EV_new
+# TOI_together_PP_joined <-  teammate_TOI_PP_new
+# TOI_together_SH_joined <-  teammate_TOI_SH_new
+# TOI_together_5v5_joined <- teammate_TOI_5v5_new
+# TOI_together_5v4_joined <- teammate_TOI_5v4_new
+# TOI_together_4v5_joined <- teammate_TOI_4v5_new
+# 
+# goalie_games_all_sit_joined <- goalie_games_all_sit_new
+# adj_pen_games_joined <-        adj_pen_games_new
+
+
 
 
 
@@ -1987,6 +2056,8 @@ saveRDS(RAPM_EV_list, "data/RAPM_EV_list_in_season.rds")
 saveRDS(RAPM_PP_list, "data/RAPM_PP_list_in_season.rds")
 saveRDS(shooting_RAPM_All_Sit_list, "data/shooting_RAPM_All_Sit_list.rds")
 
+
+saveRDS(in_season_sums_list, "data/in_season_sums_list_1819_p.rds")
 
 #################################
 

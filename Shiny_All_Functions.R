@@ -6913,7 +6913,7 @@ fun.teammate <- function(pbp_data, strength) {
 
 
 ## -------------------------- ##
-##    TOI Against Opponents   ## *** NOT USED ON SITE
+##    TOI Against Opponents   ## *** NOT USED ON SITE AT THIS TIME
 ## -------------------------- ##
 
 ################################
@@ -7773,8 +7773,8 @@ fun.opponent_TOI <- function(pbp_data, strength) {
   
   # Get goalies
   goalie_vec <- sort(unique(c(
-    sort(unique(na.omit(pbp_data$home_goalie))), 
-    sort(unique(na.omit(pbp_data$away_goalie)))
+    unique(na.omit(pbp_data$home_goalie)), 
+    unique(na.omit(pbp_data$away_goalie))
     )))
   
   # Combine

@@ -139,6 +139,10 @@ fun.league_standings <- function(season) {
     ) %>% 
     arrange(league_rank)
   
+  colnames(standings) <- tolower(colnames(standings))
+  
+  return(standings)
+  
   }
 standings <- fun.league_standings(season = "20182019")
 
