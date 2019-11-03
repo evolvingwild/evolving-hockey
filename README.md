@@ -20,32 +20,32 @@ pbp_scrape <- sc.scrape_pbp(games = c("2018020001", "2018020002"))
 
 <br>
 
-##### Function Arguments
+#### Function Arguments
 
-####### games:
+games:
 - a vector of full NHL game IDs (one or more may be provided)
 - example: 2018020001
 
 
-####### scrape_type:
+scrape_type:
 - "full": all data returned
 - "event_summary": only event summary, rosters, and scratches information returned
 - "rosters": only rosters and scratches information returned
 - default is "full"
 
 
-####### live_scrape:
+live_scrape:
 - FALSE = function adjusts incorrect player & goalie shifts
 - TRUE = function does not adjust incorrect player & goalie shifts (this should be used when scraping games that are in progress)
 - default is FALSE
 
 
-####### verbose:
+verbose:
 - TRUE = print the system time for each game scraped
 - default is TRUE
 
 
-####### sleep:
+sleep:
 - time to wait between each game being scraped (in seconds)
 - default is 0
 
