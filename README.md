@@ -1,3 +1,5 @@
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
+
 ## Scripts for <a href="https://evolving-hockey.com/" target="_blank">Evolving-Hockey.com</a>
 
 <br>
