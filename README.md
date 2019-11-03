@@ -9,7 +9,6 @@ The `sc.scrape_pbp` function is used to scrape one or more games from the NHL's 
 Example:
 
 ``` {r}
-
 ## Dependencies
 library(RCurl); library(xml2); library(rvest); library(jsonlite); library(foreach)
 library(lubridate)
