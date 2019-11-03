@@ -1,10 +1,7 @@
 ## Scripts for <a href="https://evolving-hockey.com/" target="_blank">Evolving-Hockey.com</a>
 
-  + EH_scrape_functions.R is an NHL scraper we have written that is currently in beta testing.
-  
 <br>
-
-
+s
 ### Scraper Walkthrough
 
 The `sc.scrape_pbp` function is used to scrape one or more games from the NHL's publicly available data. A list is returned with data that is requested. 
@@ -23,7 +20,6 @@ devtools::source_url("https://raw.githubusercontent.com/evolvingwild/evolving-ho
 
 ## Scrape games
 pbp_scrape <- sc.scrape_pbp(games = c("2018020001", "2018020002"))
-
 ```
 
 #### Function Arguments
