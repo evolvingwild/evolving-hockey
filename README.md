@@ -82,8 +82,3 @@ schedule_current <- sc.scrape_schedule(start_date = Sys.Date() - 1, end_date =  
 
 <br>
 <br>
-
-  
-  
-  
-  
