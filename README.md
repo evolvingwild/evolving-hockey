@@ -2,8 +2,6 @@
 
 ## Scripts for <a href="https://evolving-hockey.com/" target="_blank">Evolving-Hockey.com</a>
 
-<br>
-
 ### Scraper Walkthrough
 
 The `sc.scrape_pbp` function is used to scrape one or more games from the NHL's publicly available data. A list is returned with data that is requested. 
