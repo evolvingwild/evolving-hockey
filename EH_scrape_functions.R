@@ -180,7 +180,7 @@ na_if_null <- function(x) {
 ## --------------- ##
 
 ## Scrape Schedule
-sc.scrape_schedule <- function(start_date, end_date, print_sched = TRUE) { 
+sc.scrape_schedule <- function(start_date = Sys.Date(), end_date = Sys.Date(), print_sched = TRUE) { 
   
   ## getURL for schedule data
   url_schedule <- NULL
