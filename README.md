@@ -61,7 +61,7 @@ player_periods_new <-   pbp_scrape$player_periods     ## player TOI sums per per
 roster_df_new <-        pbp_scrape$roster_df          ## roster data
 scratches_df_new <-     pbp_scrape$scratches_df       ## scratches data
 event_summary_df_new <- pbp_scrape$events_summary_df  ## event summary data (box score stats, etc.)
-scrape_report <-        pbp_scrape$report             ## report showing number of rows and time to scrape game
+scrape_report <-        pbp_scrape$report             ## scrape report
 ```
 
 <br>
