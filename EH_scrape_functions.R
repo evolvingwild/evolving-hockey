@@ -902,6 +902,8 @@ sc.update_names_HTM <- function(data, col_name) {
           player_name == "THOMAS.MCCOLLUM" ~ "TOM.MCCOLLUM",
           player_name == "TIMOTHY JR..THOMAS" ~ "TIM.THOMAS",
           
+          player_name == "TIM.GETTINGER" ~ "TIMOTHY.GETTINGER",
+          
           TRUE ~ player_name
           )
       ) %>% 
