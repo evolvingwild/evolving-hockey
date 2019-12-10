@@ -901,8 +901,12 @@ sc.update_names_HTM <- function(data, col_name) {
           player_name == "STEPHEN.VALIQUETTE" ~ "STEVE.VALIQUETTE",
           player_name == "THOMAS.MCCOLLUM" ~ "TOM.MCCOLLUM",
           player_name == "TIMOTHY JR..THOMAS" ~ "TIM.THOMAS",
-          
+          ## '19-20
           player_name == "TIM.GETTINGER" ~ "TIMOTHY.GETTINGER",
+          
+          ## Testing
+          player_name == "NICHOLAS.SHORE" ~ "NICK.SHORE",
+          player_name == "T.J..TYNAN" ~ "TJ.TYNAN",
           
           TRUE ~ player_name
           )
@@ -3945,9 +3949,11 @@ sc.update_names_API <- function(data, col_name) {
           player_name == "TOBY.ENSTROM" ~ "TOBIAS.ENSTROM",  
           player_name == "TREVOR.VAN.RIEMSDYK" ~ "TREVOR.VAN RIEMSDYK", 
           player_name == "ZACK.FITZGERALD" ~ "ZACH.FITZGERALD", 
-          
-          ## New changes
+          ## NEW CHANGES
           player_name == "TIM.GETTINGER" ~ "TIMOTHY.GETTINGER", 
+          ## Testing
+          player_name == "NICHOLAS.SHORE" ~ "NICK.SHORE",
+          player_name == "T.J..TYNAN" ~ "TJ.TYNAN",
           
           ## Duplicate player names
           player_name == "SEBASTIAN.AHO" & birthday == "1996-02-17" ~ "SEBASTIAN.AHO2",     ## D, ID 8480222
