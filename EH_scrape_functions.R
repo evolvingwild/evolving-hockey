@@ -2391,7 +2391,10 @@ sc.shifts_finalize <- function(game_id_fun, shifts_parse_data, events_data_HTM, 
     manual_goalie_shift <- shifts_raw %>% 
       filter(player == "MICHAEL.HUTCHINSON")
     
-    manual_goalie_shift <- bind_rows(manual_goalie_shift, manual_goalie_shift[4, ])
+    manual_goalie_shift <- bind_rows(
+      manual_goalie_shift, 
+      manual_goalie_shift[4, ]
+      )
     
     manual_goalie_shift[, "game_period"] <-   c(1, 2, 3, 3, 4)
     manual_goalie_shift[, "seconds_start"] <- c(0,    1200, 2400, 3525, 3600) ## 2400 + as.numeric(seconds(ms("18:45")))
@@ -2407,6 +2410,34 @@ sc.shifts_finalize <- function(game_id_fun, shifts_parse_data, events_data_HTM, 
     
     }
   
+  if (game_id_fun == "2019020072") { 
+    
+    ## Pull out problematic goalie
+    manual_goalie_shift <- shifts_raw %>% 
+      filter(player == "PAVEL.FRANCOUZ")
+    
+    manual_goalie_shift <- bind_rows(
+      manual_goalie_shift[1, ], 
+      manual_goalie_shift[1, ], 
+      manual_goalie_shift[c(2:5), ]
+      )
+    
+    manual_goalie_shift[2, "seconds_start"] <- 72
+    manual_goalie_shift[2, "seconds_end"] <- 1200
+    manual_goalie_shift[2, "seconds_duration"] <- 1200 - 72
+    manual_goalie_shift[2, c("shift_num", "shift_start", "shift_end", "duration")] <- NA
+    manual_goalie_shift[2, "shift_mod"] <- 1
+    
+    
+    ## Combine
+    shifts_raw <- bind_rows(
+      shifts_raw %>% 
+        filter(player != "PAVEL.FRANCOUZ"), 
+      manual_goalie_shift
+      ) %>% 
+      arrange(seconds_start, event_team)
+    
+    }
   
   
   ## ---------------------- ##
