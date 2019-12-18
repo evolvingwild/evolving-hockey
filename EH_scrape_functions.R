@@ -45,7 +45,7 @@ options(
 # schedule source: https://statsapi.web.nhl.com/api/v1/schedule?startDate=2018-10-03&endDate=2018-10-03
 # roster source:   https://statsapi.web.nhl.com/api/v1/game/2018020001/boxscore
 # player bios:     https://api.nhle.com/stats/rest/en/skater/bios?isAggregate=false&isGame=false&start=0&limit=50&factCayenneExp=gamesPlayed%3E=1     
-#                  &cayenneExp=gameTypeId=2%20and%20seasonId%3C=20192020%20and%20seasonId%3E=20192020
+#                  &cayenneExp=gameTypeId=2%20and%20seasonId%3C=20182019%20and%20seasonId%3E=20182019
 
 ## ESPN links:
 # ESPN game IDs source: http://www.espn.com/nhl/scoreboard?date=20181003
