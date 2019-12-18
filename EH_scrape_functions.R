@@ -29,21 +29,23 @@ options(
 
 #####################
 
-## HTML main source:
+## NHL HTLM Reports:
 # events source:        http://www.nhl.com/scores/htmlreports/20182019/PL020001.HTM
 # rosters source:       http://www.nhl.com/scores/htmlreports/20182019/RO020001.HTM
 # shifts source (home): http://www.nhl.com/scores/htmlreports/20182019/TH020001.HTM
 # shifts source (away): http://www.nhl.com/scores/htmlreports/20182019/TV020001.HTM
-
-## HTML extras:
-# game summary:  http://www.nhl.com/scores/htmlreports/20182019/GS020001.HTM
-# event summary: http://www.nhl.com/scores/htmlreports/20182019/ES020001.HTM
+# game summary:         http://www.nhl.com/scores/htmlreports/20182019/GS020001.HTM
+# event summary:        http://www.nhl.com/scores/htmlreports/20182019/ES020001.HTM
 
 ## NHL API:
-# events source:  https://statsapi.web.nhl.com/api/v1/game/2018020001/feed/live?site=en_nhl
-# shifts source:  http://www.nhl.com/stats/rest/shiftcharts?cayenneExp=gameId=2018020001
-# shifts charts:  http://www.nhl.com/stats/shiftcharts?id=2018020001  *** (for viewing)
+# events source:   https://statsapi.web.nhl.com/api/v1/game/2018020001/feed/live?site=en_nhl
+# shifts source:   http://www.nhl.com/stats/rest/shiftcharts?cayenneExp=gameId=2018020001       *** OLD ***
+# shifts source:   https://api.nhle.com/stats/rest/en/shiftcharts?cayenneExp=gameId=2018020001  *** NEW, not implemented yet ***
+# shifts charts:   http://www.nhl.com/stats/shiftcharts?id=2018020001  *** (for viewing)
 # schedule source: https://statsapi.web.nhl.com/api/v1/schedule?startDate=2018-10-03&endDate=2018-10-03
+# roster source:   https://statsapi.web.nhl.com/api/v1/game/2018020001/boxscore
+# player bios:     https://api.nhle.com/stats/rest/en/skater/bios?isAggregate=false&isGame=false&start=0&limit=50&factCayenneExp=gamesPlayed%3E=1     
+#                  &cayenneExp=gameTypeId=2%20and%20seasonId%3C=20192020%20and%20seasonId%3E=20192020
 
 ## ESPN links:
 # ESPN game IDs source: http://www.espn.com/nhl/scoreboard?date=20181003
@@ -643,6 +645,7 @@ sc.scrape_rosters_API <- function(games_data, cores) {
        )
       )
     
+    
     ## Comine home and away players in specific game
     player_info <- bind_rows(
       ## Away skaters
@@ -675,6 +678,7 @@ sc.scrape_rosters_API <- function(games_data, cores) {
        )
     
     } %>% 
+    ## Modify returned data
     mutate(
       id = as.character(id), 
       birthDate = as.Date(birthDate), 
