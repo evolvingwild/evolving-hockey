@@ -4067,9 +4067,10 @@ sc.update_names_API <- function(data, col_name) {
           player_name == "TOBY.ENSTROM" ~ "TOBIAS.ENSTROM",  
           player_name == "TREVOR.VAN.RIEMSDYK" ~ "TREVOR.VAN RIEMSDYK", 
           player_name == "ZACK.FITZGERALD" ~ "ZACH.FITZGERALD", 
+          
           ## NEW CHANGES
           player_name == "TIM.GETTINGER" ~ "TIMOTHY.GETTINGER", 
-          ## Testing
+          player_name == "THOMAS.DI.PAULI" ~ "THOMAS.DI PAULI", 
           player_name == "NICHOLAS.SHORE" ~ "NICK.SHORE",
           player_name == "T.J..TYNAN" ~ "TJ.TYNAN",
           
