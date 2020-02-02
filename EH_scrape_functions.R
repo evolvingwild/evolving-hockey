@@ -253,7 +253,8 @@ sc.scrape_schedule <- function(start_date = Sys.Date(), end_date = Sys.Date(), p
   ## Modify bound schedule data
   schedule_current <- bind_schedule %>% 
     arrange(game_id) %>% 
-    filter(session != "PR") %>%   ## filter out preseason games
+    # filter(session != "PR") %>%   ## filter out preseason games
+    filter(session %in% c("R", "P")) %>%  ## only scrape regular season and playoff games
     mutate(
       home_team_id = Team_ID$Team[match(home_team_id, Team_ID$ID)], 
       away_team_id = Team_ID$Team[match(away_team_id, Team_ID$ID)], 

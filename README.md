@@ -25,6 +25,7 @@ pbp_scrape <- sc.scrape_pbp(games = c("2018020001", "2018020002"))
 
 games:
 - a vector of full NHL game IDs (one or more may be provided)
+  + only regular season and playoff games can be scraped as of now
 - example: 2018020001
 
 scrape_type:
