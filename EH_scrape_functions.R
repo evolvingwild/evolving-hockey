@@ -4109,7 +4109,7 @@ sc.update_names_API <- function(data, col_name) {
   
   }
 
-## Scrape & Process NHL Player Info (API)
+## Scrape & Process NHL Player Info (API)  *** deprecated ***
 sc.player_info_API <- function(season_id_fun) { 
   
   ## --------------- ##
@@ -4291,10 +4291,133 @@ sc.player_info_API <- function(season_id_fun) {
   
   }
 
+## Scrape & Process NHL Player Info (API)  *** testing ***
+sc.player_bios_API <- function(season_id_fun) { 
+  
+  ## Note: the "snakecase" package is required to run this function
+  ## it is not included as a dependency since this function is currently in testing
+  
+  start_ <- 0
+  end_ <- 0
+  
+  hold_skater_bios_regular <- jsonlite::fromJSON(
+    paste0(
+      "https://api.nhle.com/stats/rest/en/skater/bios?",
+      "isAggregate=false",
+      "&isGame=false",
+      "&sort=%5B%7B%22property%22:%22lastName%22,%22direction%22:%22ASC_CI%22%7D,%7B%22property%22:%22skaterFullName%22,%22direction%22:%22ASC_CI%22%7D%5D",
+      "&start=", start_, 
+      "&limit=", end_, 
+      "&factCayenneExp=gamesPlayed%3E=1",
+      "&cayenneExp=", 
+      "gameTypeId=", 2, 
+      "%20and%20seasonId%3C=", season_id_fun,
+      "%20and%20seasonId%3E=", season_id_fun
+      )
+    )
+  
+  hold_skater_bios_playoffs <- jsonlite::fromJSON(
+    paste0(
+      "https://api.nhle.com/stats/rest/en/skater/bios?",
+      "isAggregate=false",
+      "&isGame=false",
+      "&sort=%5B%7B%22property%22:%22lastName%22,%22direction%22:%22ASC_CI%22%7D,%7B%22property%22:%22skaterFullName%22,%22direction%22:%22ASC_CI%22%7D%5D",
+      "&start=", start_, 
+      "&limit=", end_, 
+      "&factCayenneExp=gamesPlayed%3E=1",
+      "&cayenneExp=", 
+      "gameTypeId=", 3, 
+      "%20and%20seasonId%3C=", season_id_fun,
+      "%20and%20seasonId%3E=", season_id_fun
+      )
+    )
+  
+  ## Goalies
+  hold_goalie_bios_regular <- jsonlite::fromJSON(
+    paste0(
+      "https://api.nhle.com/stats/rest/en/goalie/bios?", 
+      "isAggregate=false", 
+      "&isGame=false", 
+      "&sort=%5B%7B%22property%22:%22lastName%22,%22direction%22:%22ASC_CI%22%7D,%7B%22property%22:%22goalieFullName%22,%22direction%22:%22ASC_CI%22%7D%5D", 
+      "&start=", start_, 
+      "&limit=", end_, 
+      "&factCayenneExp=gamesPlayed%3E=1", 
+      "&cayenneExp=", 
+      "gameTypeId=", 2, 
+      "%20and%20seasonId%3C=", season_id_fun,
+      "%20and%20seasonId%3E=", season_id_fun
+      )
+    )
+  
+  hold_goalie_bios_playoffs <- jsonlite::fromJSON(
+    paste0(
+      "https://api.nhle.com/stats/rest/en/goalie/bios?", 
+      "isAggregate=false", 
+      "&isGame=false", 
+      "&sort=%5B%7B%22property%22:%22lastName%22,%22direction%22:%22ASC_CI%22%7D,%7B%22property%22:%22goalieFullName%22,%22direction%22:%22ASC_CI%22%7D%5D", 
+      "&start=", start_, 
+      "&limit=", end_, 
+      "&factCayenneExp=gamesPlayed%3E=1", 
+      "&cayenneExp=", 
+      "gameTypeId=", 3, 
+      "%20and%20seasonId%3C=", season_id_fun,
+      "%20and%20seasonId%3E=", season_id_fun
+      )
+    )
+  
+  
+  ## Ensure playoffs are present in specified season
+  if (hold_skater_bios_playoffs$total > 0 & hold_goalie_bios_playoffs$total > 0) { 
+    player_bios_df <- bind_rows(
+      hold_skater_bios_regular$data %>%  mutate(session = "R"), 
+      hold_skater_bios_playoffs$data %>% mutate(session = "P"),  
+      hold_goalie_bios_regular$data %>%  mutate(session = "R", positionCode = "G"), 
+      hold_goalie_bios_playoffs$data %>% mutate(session = "P", positionCode = "G")
+      )
+    } else {
+      player_bios_df <- bind_rows(
+        hold_skater_bios_regular$data %>% mutate(session = "R"), 
+        hold_goalie_bios_regular$data %>% mutate(session = "R", positionCode = "G")
+        )
+      }
+  
+  
+  ## Combine and process player bios data
+  player_bios_df <- player_bios_df %>% 
+    arrange(lastName) %>% 
+    mutate(
+      season = season_id_fun, 
+      fullName = ifelse(is.na(skaterFullName), goalieFullName, ifelse(is.na(goalieFullName), skaterFullName, NA))
+      ) %>% 
+    group_by(
+      playerId, fullName, lastName, 
+      positionCode, shootsCatches, 
+      season, 
+      birthDate, birthCity, birthStateProvinceCode, birthCountryCode, nationalityCode, 
+      draftYear, draftRound, draftOverall, 
+      height, weight
+      ) %>% 
+    summarise() %>% 
+    ungroup() %>% 
+    arrange(lastName, fullName) %>% 
+    rename_all(list(~snakecase::to_snake_case(.))) %>% 
+    rename(
+      api_id = player_id, 
+      position = position_code
+      ) %>% 
+    data.frame()
+  
+  
+  ## Return data
+  return(
+    player_bios_df
+    )
+  
+  }
 
 
 
-## Scrape & Process Player Names Only (from HTM shifts source)  *** Non Essential ***
+## Scrape & Process Player Names Only (from HTM shifts source)  *** Non Essential / Testing ***
 sc.get_names_combine <- function(games_vec) { 
   
   ## Get names function (from html shifts data)
