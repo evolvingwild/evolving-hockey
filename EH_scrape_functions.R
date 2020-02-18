@@ -4386,7 +4386,6 @@ sc.player_bios_API <- function(season_id_fun) {
   player_bios_df <- player_bios_df %>% 
     arrange(lastName) %>% 
     mutate(
-      player_id = as.character(playerId), 
       season = season_id_fun, 
       fullName = ifelse(is.na(skaterFullName), goalieFullName, ifelse(is.na(goalieFullName), skaterFullName, NA))
       ) %>% 
