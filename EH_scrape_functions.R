@@ -321,7 +321,12 @@ sc.scrape_events_HTM <- function(game_id_fun, season_id_fun, attempts = 3) {
     }
   
   ## Pull out events data
-  events_body_text <- rvest::html_text(rvest::html_nodes(xml2::read_html(url_events_HTM), ".bborder"))
+  events_body_text <- rvest::html_text(
+    rvest::html_nodes(
+      xml2::read_html(url_events_HTM), 
+      ".bborder"
+      )
+    )
   
   }
 
@@ -439,11 +444,11 @@ sc.scrape_events_ESPN <- function(game_id_fun, season_id_fun, game_info_data, at
         ) %>% 
       mutate_at(
         vars(home_team, away_team), 
-        funs(toupper(.))
+        list(~toupper(.))
         ) %>% 
       mutate_at(
         vars(home_team, away_team), 
-        funs(part_team_names$Team[match(., part_team_names$partTeam)])
+        list(~part_team_names$Team[match(., part_team_names$partTeam)])
         ) %>% 
       ## ensure duplicate games are not created
       group_by(game_id) %>%
@@ -457,7 +462,7 @@ sc.scrape_events_ESPN <- function(game_id_fun, season_id_fun, game_info_data, at
     ESPN_games_df <- ESPN_games_df %>% 
       mutate_at(
         vars(away_team, home_team), 
-        funs(ifelse(. == "WPG" & game_info_data$season <= 20102011, "ATL", .))
+        list(~ifelse(. == "WPG" & game_info_data$season <= 20102011, "ATL", .))
         )
     
     
@@ -554,11 +559,33 @@ sc.scrape_shifts <- function(game_id_fun, season_id_fun, attempts = 3) {
     }
   
   ## Pull out scraped shifts data
-  home_shifts_titles <- rvest::html_text(rvest::html_nodes(xml2::read_html(url_home_shifts), ".border"))
-  away_shifts_titles <- rvest::html_text(rvest::html_nodes(xml2::read_html(url_away_shifts), ".border"))
+  home_shifts_titles <- rvest::html_text(
+    rvest::html_nodes(
+      xml2::read_html(url_home_shifts), 
+      ".border"
+      )
+    )
   
-  home_shifts_text <- rvest::html_text(rvest::html_nodes(xml2::read_html(url_home_shifts), ".bborder"))
-  away_shifts_text <- rvest::html_text(rvest::html_nodes(xml2::read_html(url_away_shifts), ".bborder"))
+  away_shifts_titles <- rvest::html_text(
+    rvest::html_nodes(
+      xml2::read_html(url_away_shifts), 
+      ".border"
+      )
+    )
+  
+  home_shifts_text <- rvest::html_text(
+    rvest::html_nodes(
+      xml2::read_html(url_home_shifts), 
+      ".bborder"
+      )
+    )
+  
+  away_shifts_text <- rvest::html_text(
+    rvest::html_nodes(
+      xml2::read_html(url_away_shifts), 
+      ".bborder"
+      )
+    )
   
   
   ## Return data as list
@@ -629,7 +656,12 @@ sc.scrape_rosters <- function(game_id_fun, season_id_fun, attempts = 3) {
     }
   
   ## Pull out roster data
-  rosters_text <- rvest::html_text(rvest::html_nodes(xml2::read_html(url_rosters), "td"))
+  rosters_text <- rvest::html_text(
+    rvest::html_nodes(
+      xml2::read_html(url_rosters), 
+      "td"
+      )
+    )
   
   }
 
@@ -689,20 +721,18 @@ sc.scrape_rosters_API <- function(games_data, cores) {
       id = as.character(id), 
       birthDate = as.Date(birthDate), 
       currentAge = round(as.numeric((as.Date(paste0(substr(season, 1, 4), "-9-15"), "%Y-%m-%d") - birthDate) / 365.25), 2), 
-      position = 
-        case_when(
-          primaryPosition.type == "Forward" ~ "F", 
-          primaryPosition.type == "Defenseman" ~ "D", 
-          primaryPosition.type == "Goalie" ~ "G"
-          ), 
-      position_type = 
-        case_when(
-          primaryPosition.abbreviation == "LW" ~ "L", 
-          primaryPosition.abbreviation == "C" ~ "C", 
-          primaryPosition.abbreviation == "RW" ~ "R", 
-          primaryPosition.abbreviation == "D" ~ "D", 
-          primaryPosition.abbreviation == "G" ~ "G"
-          )
+      position = case_when(
+        primaryPosition.type == "Forward" ~ "F", 
+        primaryPosition.type == "Defenseman" ~ "D", 
+        primaryPosition.type == "Goalie" ~ "G"
+        ),
+      position_type = case_when(
+        primaryPosition.abbreviation == "LW" ~ "L", 
+        primaryPosition.abbreviation == "C" ~ "C", 
+        primaryPosition.abbreviation == "RW" ~ "R", 
+        primaryPosition.abbreviation == "D" ~ "D", 
+        primaryPosition.abbreviation == "G" ~ "G"
+        )
       ) %>% 
     select(
       api_id = id, fullName, position, position_type, birthDate, game_id, game_date, season, session, team, opponent, is_home, 
@@ -716,7 +746,6 @@ sc.scrape_rosters_API <- function(games_data, cores) {
   return(players)
   
   }
-
 
 ## Scrape Event Summary
 sc.scrape_event_summary <- function(game_id_fun, season_id_fun, attempts = 3) { 
@@ -743,7 +772,12 @@ sc.scrape_event_summary <- function(game_id_fun, season_id_fun, attempts = 3) {
     }
   
   ## Pull out roster data
-  event_summary_text <- rvest::html_text(rvest::html_nodes(xml2::read_html(url_event_summary), "td"))
+  event_summary_text <- rvest::html_text(
+    rvest::html_nodes(
+      xml2::read_html(url_event_summary), 
+      "td"
+      )
+    )
   
   }
 
@@ -804,12 +838,11 @@ sc.game_info <- function(game_id_fun, season_id_fun, events_data, roster_data) {
     season =          season_id_fun, 
     game_date =       first(roster_data[grep("^[a-zA-Z]*, ", roster_data)]) %>% gsub("^[a-zA-Z]*, ", "", .) %>% as.Date(., format = "%B %d, %Y") %>% as.character(), 
     # session =         ifelse(as.character(substr(game_id_fun, 6, 10)) > 30000, "P", "R"), 
-    session = 
-      case_when(
-        as.character(substr(game_id_fun, 6, 10)) > 20000 & as.character(substr(game_id_fun, 6, 10)) < 30000  ~ "R", 
-        as.character(substr(game_id_fun, 6, 10)) > 30000 ~ "P", 
-        as.character(substr(game_id_fun, 6, 10)) < 20000 ~ "PS"
-        ), 
+    session = case_when(
+      as.character(substr(game_id_fun, 6, 10)) > 20000 & as.character(substr(game_id_fun, 6, 10)) < 30000  ~ "R", 
+      as.character(substr(game_id_fun, 6, 10)) > 30000 ~ "P", 
+      as.character(substr(game_id_fun, 6, 10)) < 20000 ~ "PS"
+      ), 
     game_time_start = first(na.omit(str_extract(roster_data, "[sS]tart\\s*[0-9]+:[0-9]+\\s*[A-Z]+"))) %>% gsub("[sS]tart\\s*", "", .), 
     game_time_end =   first(na.omit(str_extract(roster_data, "[eE]nd\\s*[0-9]+:[0-9]+\\s*[A-Z]+"))) %>% gsub("[eE]nd\\s*", "", .), 
     venue =           venue_vec, 
@@ -858,151 +891,149 @@ sc.update_names_HTM <- function(data, col_name) {
   ## Find and modify incorrect player names
   fixed_names_df <- data %>% 
     mutate(
-      player_name = 
-        ## Global name changes
-        case_when(
-          grepl("^ALEXANDER.|^ALEXANDRE.", player_name) ~ gsub("^ALEXANDER.|^ALEXANDRE.", "ALEX.", player_name), 
-          grepl("^CHRISTOPHER.", player_name) ~ gsub("^CHRISTOPHER.", "CHRIS.", player_name), 
-          TRUE ~ player_name
-          ), 
-      player_name = 
-        ## Specific name changes
-        case_when(
-          player_name == "ANDREI.KASTSITSYN" ~ "ANDREI.KOSTITSYN",
-          player_name == "AJ.GREER" ~ "A.J..GREER",
-          player_name == "ANDREW.GREENE" ~ "ANDY.GREENE",
-          player_name == "ANDREW.WOZNIEWSKI" ~ "ANDY.WOZNIEWSKI", 
-          player_name == "ANTHONY.DEANGELO" ~ "TONY.DEANGELO",
-          player_name == "BATES (JON).BATTAGLIA" ~ "BATES.BATTAGLIA",
-          player_name %in% c("BJ.CROMBEEN", "B.J.CROMBEEN", "BRANDON.CROMBEEN") ~ "B.J..CROMBEEN", 
-          player_name == "BRADLEY.MILLS" ~ "BRAD.MILLS",
-          player_name == "CAMERON.BARKER" ~ "CAM.BARKER", 
-          player_name == "COLIN (JOHN).WHITE" ~ "COLIN.WHITE",
-          player_name == "CRISTOVAL.NIEVES" ~ "BOO.NIEVES",
-          player_name == "CHRIS.VANDE VELDE" ~ "CHRIS.VANDEVELDE", 
-          player_name == "DANNY.BRIERE" ~ "DANIEL.BRIERE",
-          player_name %in% c("DAN.CLEARY", "DANNY.CLEARY") ~ "DANIEL.CLEARY",
-          player_name == "DANIEL.GIRARDI" ~ "DAN.GIRARDI", 
-          player_name == "DANNY.O'REGAN" ~ "DANIEL.O'REGAN",
-          player_name == "DANIEL.CARCILLO" ~ "DAN.CARCILLO", 
-          player_name == "DAVID JOHNNY.ODUYA" ~ "JOHNNY.ODUYA", 
-          player_name == "DAVID.BOLLAND" ~ "DAVE.BOLLAND", 
-          player_name == "DENIS JR..GAUTHIER" ~ "DENIS.GAUTHIER",
-          player_name == "DWAYNE.KING" ~ "DJ.KING", 
-          player_name == "EDWARD.PURCELL" ~ "TEDDY.PURCELL", 
-          player_name == "EMMANUEL.FERNANDEZ" ~ "MANNY.FERNANDEZ", 
-          player_name == "EMMANUEL.LEGACE" ~ "MANNY.LEGACE", 
-          player_name == "EVGENII.DADONOV" ~ "EVGENY.DADONOV", 
-          player_name == "FREDDY.MODIN" ~ "FREDRIK.MODIN", 
-          player_name == "FREDERICK.MEYER IV" ~ "FREDDY.MEYER",
-          player_name == "HARRISON.ZOLNIERCZYK" ~ "HARRY.ZOLNIERCZYK", 
-          player_name == "ILJA.BRYZGALOV" ~ "ILYA.BRYZGALOV", 
-          player_name == "JACOB.DOWELL" ~ "JAKE.DOWELL",
-          player_name == "JAMES.HOWARD" ~ "JIMMY.HOWARD", 
-          player_name == "JAMES.VANDERMEER" ~ "JIM.VANDERMEER",
-          player_name == "JAMES.WYMAN" ~ "JT.WYMAN",
-          player_name == "JOHN.HILLEN III" ~ "JACK.HILLEN",
-          player_name == "JOHN.ODUYA" ~ "JOHNNY.ODUYA",
-          player_name == "JOHN.PEVERLEY" ~ "RICH.PEVERLEY",
-          player_name == "JONATHAN.SIM" ~ "JON.SIM",
-          player_name == "JONATHON.KALINSKI" ~ "JON.KALINSKI",
-          player_name == "JONATHAN.AUDY-MARCHESSAULT" ~ "JONATHAN.MARCHESSAULT", 
-          player_name == "JOSEPH.CRABB" ~ "JOEY.CRABB",
-          player_name == "JOSEPH.CORVO" ~ "JOE.CORVO", 
-          player_name == "JOSHUA.BAILEY" ~ "JOSH.BAILEY",
-          player_name == "JOSHUA.HENNESSY" ~ "JOSH.HENNESSY", 
-          player_name == "JOSHUA.MORRISSEY" ~ "JOSH.MORRISSEY",
-          player_name == "JEAN-FRANCOIS.JACQUES" ~ "J-F.JACQUES", 
-          player_name %in% c("J P.DUMONT", "JEAN-PIERRE.DUMONT") ~ "J-P.DUMONT", 
-          player_name == "JT.COMPHER" ~ "J.T..COMPHER",
-          player_name == "KRISTOPHER.LETANG" ~ "KRIS.LETANG", 
-          player_name == "KRYSTOFER.BARCH" ~ "KRYS.BARCH", 
-          player_name == "KRYSTOFER.KOLANOS" ~ "KRYS.KOLANOS",
-          player_name == "MARC.POULIOT" ~ "MARC-ANTOINE.POULIOT",
-          player_name == "MARTIN.ST LOUIS" ~ "MARTIN.ST. LOUIS", 
-          player_name == "MARTIN.ST PIERRE" ~ "MARTIN.ST. PIERRE",
-          player_name == "MARTY.HAVLAT" ~ "MARTIN.HAVLAT",
-          player_name == "MATTHEW.CARLE" ~ "MATT.CARLE", 
-          player_name == "MATHEW.DUMBA" ~ "MATT.DUMBA",
-          player_name == "MATTHEW.BENNING" ~ "MATT.BENNING", 
-          player_name == "MATTHEW.IRWIN" ~ "MATT.IRWIN",
-          player_name == "MATTHEW.NIETO" ~ "MATT.NIETO",
-          player_name == "MATTHEW.STAJAN" ~ "MATT.STAJAN",
-          player_name == "MAXIM.MAYOROV" ~ "MAKSIM.MAYOROV",
-          player_name == "MAXIME.TALBOT" ~ "MAX.TALBOT", 
-          player_name == "MAXWELL.REINHART" ~ "MAX.REINHART",
-          player_name == "MICHAEL.BLUNDEN" ~ "MIKE.BLUNDEN",
-          player_name == "MICHAËL.BOURNIVAL" ~ "MICHAEL.BOURNIVAL",
-          player_name == "MICHAEL.CAMMALLERI" ~ "MIKE.CAMMALLERI", 
-          player_name == "MICHAEL.FERLAND" ~ "MICHEAL.FERLAND", 
-          player_name == "MICHAEL.GRIER" ~ "MIKE.GRIER",
-          player_name == "MICHAEL.KNUBLE" ~ "MIKE.KNUBLE",
-          player_name == "MICHAEL.KOMISAREK" ~ "MIKE.KOMISAREK",
-          player_name == "MICHAEL.MATHESON" ~ "MIKE.MATHESON",
-          player_name == "MICHAEL.MODANO" ~ "MIKE.MODANO",
-          player_name == "MICHAEL.RUPP" ~ "MIKE.RUPP",
-          player_name == "MICHAEL.SANTORELLI" ~ "MIKE.SANTORELLI", 
-          player_name == "MICHAEL.SILLINGER" ~ "MIKE.SILLINGER",
-          player_name == "MITCHELL.MARNER" ~ "MITCH.MARNER", 
-          player_name == "NATHAN.GUENIN" ~ "NATE.GUENIN",
-          player_name == "NICHOLAS.BOYNTON" ~ "NICK.BOYNTON",
-          player_name == "NICHOLAS.DRAZENOVIC" ~ "NICK.DRAZENOVIC", 
-          player_name == "NICKLAS.BERGFORS" ~ "NICLAS.BERGFORS",
-          player_name == "NICKLAS.GROSSMAN" ~ "NICKLAS.GROSSMANN", 
-          player_name == "NICOLAS.PETAN" ~ "NIC.PETAN", 
-          player_name == "NIKLAS.KRONVALL" ~ "NIKLAS.KRONWALL",
-          player_name == "NIKOLAI.ANTROPOV" ~ "NIK.ANTROPOV",
-          player_name == "NIKOLAI.KULEMIN" ~ "NIKOLAY.KULEMIN", 
-          player_name == "NIKOLAI.ZHERDEV" ~ "NIKOLAY.ZHERDEV",
-          player_name == "OLIVIER.MAGNAN-GRENIER" ~ "OLIVIER.MAGNAN",
-          player_name == "PAT.MAROON" ~ "PATRICK.MAROON", 
-          player_name %in% c("P. J..AXELSSON", "PER JOHAN.AXELSSON") ~ "P.J..AXELSSON",
-          player_name %in% c("PK.SUBBAN", "P.K.SUBBAN") ~ "P.K..SUBBAN", 
-          player_name %in% c("PIERRE.PARENTEAU", "PIERRE-ALEX.PARENTEAU", "PIERRE-ALEXANDRE.PARENTEAU", "PA.PARENTEAU", "P.A.PARENTEAU", "P-A.PARENTEAU") ~ "P.A..PARENTEAU", 
-          player_name == "PHILIP.VARONE" ~ "PHIL.VARONE",
-          player_name == "QUINTIN.HUGHES" ~ "QUINN.HUGHES",
-          player_name == "RAYMOND.MACIAS" ~ "RAY.MACIAS",
-          player_name == "RJ.UMBERGER" ~ "R.J..UMBERGER",
-          player_name == "ROBERT.BLAKE" ~ "ROB.BLAKE",
-          player_name == "ROBERT.EARL" ~ "ROBBIE.EARL",
-          player_name == "ROBERT.HOLIK" ~ "BOBBY.HOLIK",
-          player_name == "ROBERT.SCUDERI" ~ "ROB.SCUDERI",
-          player_name == "RODNEY.PELLEY" ~ "ROD.PELLEY",
-          player_name == "SIARHEI.KASTSITSYN" ~ "SERGEI.KOSTITSYN",
-          player_name == "SIMEON.VARLAMOV" ~ "SEMYON.VARLAMOV", 
-          player_name == "STAFFAN.KRONVALL" ~ "STAFFAN.KRONWALL",
-          player_name == "STEVEN.REINPRECHT" ~ "STEVE.REINPRECHT",
-          player_name == "TJ.GALIARDI" ~ "T.J..GALIARDI",
-          player_name == "TJ.HENSICK" ~ "T.J..HENSICK",
-          player_name %in% c("TJ.OSHIE", "T.J.OSHIE") ~ "T.J..OSHIE", 
-          player_name == "TOBY.ENSTROM" ~ "TOBIAS.ENSTROM", 
-          player_name == "TOMMY.SESTITO" ~ "TOM.SESTITO",
-          player_name == "VACLAV.PROSPAL" ~ "VINNY.PROSPAL",
-          player_name == "VINCENT.HINOSTROZA" ~ "VINNIE.HINOSTROZA",
-          player_name == "WILLIAM.THOMAS" ~ "BILL.THOMAS",
-          player_name == "ZACHARY.ASTON-REESE" ~ "ZACH.ASTON-REESE",
-          player_name == "ZACHARY.SANFORD" ~ "ZACH.SANFORD",
-          player_name == "ZACHERY.STORTINI" ~ "ZACK.STORTINI",
-          
-          ## NEW CHANGES
-          player_name == "MATTHEW.MURRAY" ~ "MATT.MURRAY",
-          player_name == "J-SEBASTIEN.AUBIN" ~ "JEAN-SEBASTIEN.AUBIN",
-          player_name %in% c("J.F..BERUBE", "JEAN-FRANCOIS.BERUBE") ~ "J-F.BERUBE", 
-          player_name == "JEFF.DROUIN-DESLAURIERS" ~ "JEFF.DESLAURIERS", 
-          player_name == "NICHOLAS.BAPTISTE" ~ "NICK.BAPTISTE",
-          player_name == "OLAF.KOLZIG" ~ "OLIE.KOLZIG",
-          player_name == "STEPHEN.VALIQUETTE" ~ "STEVE.VALIQUETTE",
-          player_name == "THOMAS.MCCOLLUM" ~ "TOM.MCCOLLUM",
-          player_name == "TIMOTHY JR..THOMAS" ~ "TIM.THOMAS",
-          ## '19-20
-          player_name == "TIM.GETTINGER" ~ "TIMOTHY.GETTINGER",
-          
-          ## Testing
-          player_name == "NICHOLAS.SHORE" ~ "NICK.SHORE",
-          player_name == "T.J..TYNAN" ~ "TJ.TYNAN",
-          
-          TRUE ~ player_name
-          )
+      ## Global name changes
+      player_name = case_when(
+        grepl("^ALEXANDER.|^ALEXANDRE.", player_name) ~ gsub("^ALEXANDER.|^ALEXANDRE.", "ALEX.", player_name), 
+        grepl("^CHRISTOPHER.", player_name) ~ gsub("^CHRISTOPHER.", "CHRIS.", player_name), 
+        TRUE ~ player_name
+        ), 
+      ## Specific name changes
+      player_name = case_when(
+        player_name == "ANDREI.KASTSITSYN" ~ "ANDREI.KOSTITSYN",
+        player_name == "AJ.GREER" ~ "A.J..GREER",
+        player_name == "ANDREW.GREENE" ~ "ANDY.GREENE",
+        player_name == "ANDREW.WOZNIEWSKI" ~ "ANDY.WOZNIEWSKI", 
+        player_name == "ANTHONY.DEANGELO" ~ "TONY.DEANGELO",
+        player_name == "BATES (JON).BATTAGLIA" ~ "BATES.BATTAGLIA",
+        player_name %in% c("BJ.CROMBEEN", "B.J.CROMBEEN", "BRANDON.CROMBEEN") ~ "B.J..CROMBEEN", 
+        player_name == "BRADLEY.MILLS" ~ "BRAD.MILLS",
+        player_name == "CAMERON.BARKER" ~ "CAM.BARKER", 
+        player_name == "COLIN (JOHN).WHITE" ~ "COLIN.WHITE",
+        player_name == "CRISTOVAL.NIEVES" ~ "BOO.NIEVES",
+        player_name == "CHRIS.VANDE VELDE" ~ "CHRIS.VANDEVELDE", 
+        player_name == "DANNY.BRIERE" ~ "DANIEL.BRIERE",
+        player_name %in% c("DAN.CLEARY", "DANNY.CLEARY") ~ "DANIEL.CLEARY",
+        player_name == "DANIEL.GIRARDI" ~ "DAN.GIRARDI", 
+        player_name == "DANNY.O'REGAN" ~ "DANIEL.O'REGAN",
+        player_name == "DANIEL.CARCILLO" ~ "DAN.CARCILLO", 
+        player_name == "DAVID JOHNNY.ODUYA" ~ "JOHNNY.ODUYA", 
+        player_name == "DAVID.BOLLAND" ~ "DAVE.BOLLAND", 
+        player_name == "DENIS JR..GAUTHIER" ~ "DENIS.GAUTHIER",
+        player_name == "DWAYNE.KING" ~ "DJ.KING", 
+        player_name == "EDWARD.PURCELL" ~ "TEDDY.PURCELL", 
+        player_name == "EMMANUEL.FERNANDEZ" ~ "MANNY.FERNANDEZ", 
+        player_name == "EMMANUEL.LEGACE" ~ "MANNY.LEGACE", 
+        player_name == "EVGENII.DADONOV" ~ "EVGENY.DADONOV", 
+        player_name == "FREDDY.MODIN" ~ "FREDRIK.MODIN", 
+        player_name == "FREDERICK.MEYER IV" ~ "FREDDY.MEYER",
+        player_name == "HARRISON.ZOLNIERCZYK" ~ "HARRY.ZOLNIERCZYK", 
+        player_name == "ILJA.BRYZGALOV" ~ "ILYA.BRYZGALOV", 
+        player_name == "JACOB.DOWELL" ~ "JAKE.DOWELL",
+        player_name == "JAMES.HOWARD" ~ "JIMMY.HOWARD", 
+        player_name == "JAMES.VANDERMEER" ~ "JIM.VANDERMEER",
+        player_name == "JAMES.WYMAN" ~ "JT.WYMAN",
+        player_name == "JOHN.HILLEN III" ~ "JACK.HILLEN",
+        player_name == "JOHN.ODUYA" ~ "JOHNNY.ODUYA",
+        player_name == "JOHN.PEVERLEY" ~ "RICH.PEVERLEY",
+        player_name == "JONATHAN.SIM" ~ "JON.SIM",
+        player_name == "JONATHON.KALINSKI" ~ "JON.KALINSKI",
+        player_name == "JONATHAN.AUDY-MARCHESSAULT" ~ "JONATHAN.MARCHESSAULT", 
+        player_name == "JOSEPH.CRABB" ~ "JOEY.CRABB",
+        player_name == "JOSEPH.CORVO" ~ "JOE.CORVO", 
+        player_name == "JOSHUA.BAILEY" ~ "JOSH.BAILEY",
+        player_name == "JOSHUA.HENNESSY" ~ "JOSH.HENNESSY", 
+        player_name == "JOSHUA.MORRISSEY" ~ "JOSH.MORRISSEY",
+        player_name == "JEAN-FRANCOIS.JACQUES" ~ "J-F.JACQUES", 
+        player_name %in% c("J P.DUMONT", "JEAN-PIERRE.DUMONT") ~ "J-P.DUMONT", 
+        player_name == "JT.COMPHER" ~ "J.T..COMPHER",
+        player_name == "KRISTOPHER.LETANG" ~ "KRIS.LETANG", 
+        player_name == "KRYSTOFER.BARCH" ~ "KRYS.BARCH", 
+        player_name == "KRYSTOFER.KOLANOS" ~ "KRYS.KOLANOS",
+        player_name == "MARC.POULIOT" ~ "MARC-ANTOINE.POULIOT",
+        player_name == "MARTIN.ST LOUIS" ~ "MARTIN.ST. LOUIS", 
+        player_name == "MARTIN.ST PIERRE" ~ "MARTIN.ST. PIERRE",
+        player_name == "MARTY.HAVLAT" ~ "MARTIN.HAVLAT",
+        player_name == "MATTHEW.CARLE" ~ "MATT.CARLE", 
+        player_name == "MATHEW.DUMBA" ~ "MATT.DUMBA",
+        player_name == "MATTHEW.BENNING" ~ "MATT.BENNING", 
+        player_name == "MATTHEW.IRWIN" ~ "MATT.IRWIN",
+        player_name == "MATTHEW.NIETO" ~ "MATT.NIETO",
+        player_name == "MATTHEW.STAJAN" ~ "MATT.STAJAN",
+        player_name == "MAXIM.MAYOROV" ~ "MAKSIM.MAYOROV",
+        player_name == "MAXIME.TALBOT" ~ "MAX.TALBOT", 
+        player_name == "MAXWELL.REINHART" ~ "MAX.REINHART",
+        player_name == "MICHAEL.BLUNDEN" ~ "MIKE.BLUNDEN",
+        player_name == "MICHAËL.BOURNIVAL" ~ "MICHAEL.BOURNIVAL",
+        player_name == "MICHAEL.CAMMALLERI" ~ "MIKE.CAMMALLERI", 
+        player_name == "MICHAEL.FERLAND" ~ "MICHEAL.FERLAND", 
+        player_name == "MICHAEL.GRIER" ~ "MIKE.GRIER",
+        player_name == "MICHAEL.KNUBLE" ~ "MIKE.KNUBLE",
+        player_name == "MICHAEL.KOMISAREK" ~ "MIKE.KOMISAREK",
+        player_name == "MICHAEL.MATHESON" ~ "MIKE.MATHESON",
+        player_name == "MICHAEL.MODANO" ~ "MIKE.MODANO",
+        player_name == "MICHAEL.RUPP" ~ "MIKE.RUPP",
+        player_name == "MICHAEL.SANTORELLI" ~ "MIKE.SANTORELLI", 
+        player_name == "MICHAEL.SILLINGER" ~ "MIKE.SILLINGER",
+        player_name == "MITCHELL.MARNER" ~ "MITCH.MARNER", 
+        player_name == "NATHAN.GUENIN" ~ "NATE.GUENIN",
+        player_name == "NICHOLAS.BOYNTON" ~ "NICK.BOYNTON",
+        player_name == "NICHOLAS.DRAZENOVIC" ~ "NICK.DRAZENOVIC", 
+        player_name == "NICKLAS.BERGFORS" ~ "NICLAS.BERGFORS",
+        player_name == "NICKLAS.GROSSMAN" ~ "NICKLAS.GROSSMANN", 
+        player_name == "NICOLAS.PETAN" ~ "NIC.PETAN", 
+        player_name == "NIKLAS.KRONVALL" ~ "NIKLAS.KRONWALL",
+        player_name == "NIKOLAI.ANTROPOV" ~ "NIK.ANTROPOV",
+        player_name == "NIKOLAI.KULEMIN" ~ "NIKOLAY.KULEMIN", 
+        player_name == "NIKOLAI.ZHERDEV" ~ "NIKOLAY.ZHERDEV",
+        player_name == "OLIVIER.MAGNAN-GRENIER" ~ "OLIVIER.MAGNAN",
+        player_name == "PAT.MAROON" ~ "PATRICK.MAROON", 
+        player_name %in% c("P. J..AXELSSON", "PER JOHAN.AXELSSON") ~ "P.J..AXELSSON",
+        player_name %in% c("PK.SUBBAN", "P.K.SUBBAN") ~ "P.K..SUBBAN", 
+        player_name %in% c("PIERRE.PARENTEAU", "PIERRE-ALEX.PARENTEAU", "PIERRE-ALEXANDRE.PARENTEAU", "PA.PARENTEAU", "P.A.PARENTEAU", "P-A.PARENTEAU") ~ "P.A..PARENTEAU", 
+        player_name == "PHILIP.VARONE" ~ "PHIL.VARONE",
+        player_name == "QUINTIN.HUGHES" ~ "QUINN.HUGHES",
+        player_name == "RAYMOND.MACIAS" ~ "RAY.MACIAS",
+        player_name == "RJ.UMBERGER" ~ "R.J..UMBERGER",
+        player_name == "ROBERT.BLAKE" ~ "ROB.BLAKE",
+        player_name == "ROBERT.EARL" ~ "ROBBIE.EARL",
+        player_name == "ROBERT.HOLIK" ~ "BOBBY.HOLIK",
+        player_name == "ROBERT.SCUDERI" ~ "ROB.SCUDERI",
+        player_name == "RODNEY.PELLEY" ~ "ROD.PELLEY",
+        player_name == "SIARHEI.KASTSITSYN" ~ "SERGEI.KOSTITSYN",
+        player_name == "SIMEON.VARLAMOV" ~ "SEMYON.VARLAMOV", 
+        player_name == "STAFFAN.KRONVALL" ~ "STAFFAN.KRONWALL",
+        player_name == "STEVEN.REINPRECHT" ~ "STEVE.REINPRECHT",
+        player_name == "TJ.GALIARDI" ~ "T.J..GALIARDI",
+        player_name == "TJ.HENSICK" ~ "T.J..HENSICK",
+        player_name %in% c("TJ.OSHIE", "T.J.OSHIE") ~ "T.J..OSHIE", 
+        player_name == "TOBY.ENSTROM" ~ "TOBIAS.ENSTROM", 
+        player_name == "TOMMY.SESTITO" ~ "TOM.SESTITO",
+        player_name == "VACLAV.PROSPAL" ~ "VINNY.PROSPAL",
+        player_name == "VINCENT.HINOSTROZA" ~ "VINNIE.HINOSTROZA",
+        player_name == "WILLIAM.THOMAS" ~ "BILL.THOMAS",
+        player_name == "ZACHARY.ASTON-REESE" ~ "ZACH.ASTON-REESE",
+        player_name == "ZACHARY.SANFORD" ~ "ZACH.SANFORD",
+        player_name == "ZACHERY.STORTINI" ~ "ZACK.STORTINI",
+        
+        ## NEW CHANGES
+        player_name == "MATTHEW.MURRAY" ~ "MATT.MURRAY",
+        player_name == "J-SEBASTIEN.AUBIN" ~ "JEAN-SEBASTIEN.AUBIN",
+        player_name %in% c("J.F..BERUBE", "JEAN-FRANCOIS.BERUBE") ~ "J-F.BERUBE", 
+        player_name == "JEFF.DROUIN-DESLAURIERS" ~ "JEFF.DESLAURIERS", 
+        player_name == "NICHOLAS.BAPTISTE" ~ "NICK.BAPTISTE",
+        player_name == "OLAF.KOLZIG" ~ "OLIE.KOLZIG",
+        player_name == "STEPHEN.VALIQUETTE" ~ "STEVE.VALIQUETTE",
+        player_name == "THOMAS.MCCOLLUM" ~ "TOM.MCCOLLUM",
+        player_name == "TIMOTHY JR..THOMAS" ~ "TIM.THOMAS",
+        ## '19-20
+        player_name == "TIM.GETTINGER" ~ "TIMOTHY.GETTINGER",
+        
+        ## Testing
+        player_name == "NICHOLAS.SHORE" ~ "NICK.SHORE",
+        player_name == "T.J..TYNAN" ~ "TJ.TYNAN",
+        
+        TRUE ~ player_name
+        )
       ) %>% 
     data.frame()
   
@@ -1109,38 +1140,42 @@ sc.roster_info <- function(game_id_fun, season_id_fun, roster_data, game_info_da
       sc.update_names_HTM(., col_name = "player") %>% 
       ## Manula Name Updates
       mutate(
-        player = 
-          case_when(
-            player == "SEBASTIAN.AHO" & position == "D" ~ "SEBASTIAN.AHO2",  ## D, ID 8480222
-            player == "ALEX.PICARD" & position == "L" ~ "ALEX.PICARD2",      ## L, ID 8471221
-            player == "SEAN.COLLINS" & position == "C" ~ "SEAN.COLLINS2",    ## C, ID 8474744
-            player == "COLIN.WHITE" & as.numeric(game_info_data$season) >= 20162017 ~ "COLIN.WHITE2",         ## C, ID 8478400
-            player == "ERIK.GUSTAFSSON" & as.numeric(game_info_data$season) >= 20152016 ~ "ERIK.GUSTAFSSON2", ## D, ID 8476979 (CHI player)
-            
-            player == "ANDREW.MILLER" & season == "20072008" ~ "DREW.MILLER", ## DREW.MILLER 8470778 ID
-            TRUE ~ player
-            )
+        player = case_when(
+          player == "SEBASTIAN.AHO" & position == "D" ~ "SEBASTIAN.AHO2",  ## D, ID 8480222
+          player == "ALEX.PICARD" & position == "L" ~ "ALEX.PICARD2",      ## L, ID 8471221
+          player == "SEAN.COLLINS" & position == "C" ~ "SEAN.COLLINS2",    ## C, ID 8474744
+          player == "COLIN.WHITE" & as.numeric(game_info_data$season) >= 20162017 ~ "COLIN.WHITE2",         ## C, ID 8478400
+          player == "ERIK.GUSTAFSSON" & as.numeric(game_info_data$season) >= 20152016 ~ "ERIK.GUSTAFSSON2", ## D, ID 8476979 (CHI player)
+          
+          player == "ANDREW.MILLER" & season == "20072008" ~ "DREW.MILLER", ## DREW.MILLER 8470778 ID
+          TRUE ~ player
+          )
         ) %>% 
       
-      select(player, position, position_type, game_id, game_date, season, session, Team, Opponent, is_home, player_num, player_team_num) %>% 
+      select(
+        player, position, position_type, game_id, game_date, season, session, 
+        Team, Opponent, is_home, 
+        player_num, player_team_num
+        ) %>% 
       arrange(is_home, player) %>% 
       data.frame()
     
     } else {
       
       roster_scratches <- data.frame(
-        player = character(), 
-        position = character(), 
-        position_type = character(), 
-        game_id = character(), 
-        game_date = character(), 
-        season = character(), 
-        session = character(), 
-        Team = character(), 
-        Opponent = character(), 
-        is_home = numeric(), 
-        player_num = numeric(), 
+        player =          character(), 
+        position =        character(), 
+        position_type =   character(), 
+        game_id =         character(), 
+        game_date =       character(), 
+        season =          character(), 
+        session =         character(), 
+        Team =            character(), 
+        Opponent =        character(), 
+        is_home =         numeric(), 
+        player_num =      numeric(), 
         player_team_num = character(), 
+        
         stringsAsFactors = FALSE
         )
       
@@ -1205,17 +1240,16 @@ sc.roster_info <- function(game_id_fun, season_id_fun, roster_data, game_info_da
     sc.update_names_HTM(., col_name = "player") %>% 
     ## Manual Name Corrections
     mutate(
-      player = 
-        case_when(
-          player == "SEBASTIAN.AHO" & position == "D" ~ "SEBASTIAN.AHO2",  ## D, ID 8480222
-          player == "ALEX.PICARD" & position == "L" ~ "ALEX.PICARD2",      ## L, ID 8471221
-          player == "SEAN.COLLINS" & position == "C" ~ "SEAN.COLLINS2",    ## C, ID 8474744
-          player == "COLIN.WHITE" & as.numeric(game_info_data$season) >= 20162017 ~ "COLIN.WHITE2",         ## C, ID 8478400
-          player == "ERIK.GUSTAFSSON" & as.numeric(game_info_data$season) >= 20152016 ~ "ERIK.GUSTAFSSON2", ## D, ID 8476979 (CHI player)
-          
-          player == "ANDREW.MILLER" & season == "20072008" ~ "DREW.MILLER", ## DREW.MILLER 8470778 ID
-          TRUE ~ player
-          )
+      player = case_when(
+        player == "SEBASTIAN.AHO" & position == "D" ~ "SEBASTIAN.AHO2",  ## D, ID 8480222
+        player == "ALEX.PICARD" & position == "L" ~ "ALEX.PICARD2",      ## L, ID 8471221
+        player == "SEAN.COLLINS" & position == "C" ~ "SEAN.COLLINS2",    ## C, ID 8474744
+        player == "COLIN.WHITE" & as.numeric(game_info_data$season) >= 20162017 ~ "COLIN.WHITE2",         ## C, ID 8478400
+        player == "ERIK.GUSTAFSSON" & as.numeric(game_info_data$season) >= 20152016 ~ "ERIK.GUSTAFSSON2", ## D, ID 8476979 (CHI player)
+        
+        player == "ANDREW.MILLER" & season == "20072008" ~ "DREW.MILLER", ## DREW.MILLER 8470778 ID
+        TRUE ~ player
+        )
       ) %>% 
     select(
       player, player_num, Team, game_id, game_date, season, session, num_last_first, 
@@ -1302,7 +1336,7 @@ sc.event_summary <- function(game_id_fun, season_id_fun, event_summary_data, ros
         data.frame(stringsAsFactors = FALSE)
       
       } %>% 
-      mutate_all(funs(gsub("\\b\\s\\b", 0, .))) %>% 
+      mutate_all(list(~gsub("\\b\\s\\b", 0, .))) %>% 
       mutate(
         Team =     game_info_data$away_team, 
         Opponent = game_info_data$home_team, 
@@ -1317,7 +1351,7 @@ sc.event_summary <- function(game_id_fun, season_id_fun, event_summary_data, ros
         data.frame(stringsAsFactors = FALSE)
       
       } %>% 
-      mutate_all(funs(gsub("\\b\\s\\b", 0, .))) %>% 
+      mutate_all(list(~gsub("\\b\\s\\b", 0, .))) %>% 
       mutate(
         Team =     game_info_data$home_team, 
         Opponent = game_info_data$away_team, 
@@ -1339,7 +1373,7 @@ sc.event_summary <- function(game_id_fun, season_id_fun, event_summary_data, ros
   event_summary_all <- event_summary_all %>% 
     mutate_at(
       vars(G:PIM, SHF, S:FO_perc), 
-      funs(suppressWarnings(as.numeric(.)))   ## Warning: In evalq(as.numeric(G), <environment>) : NAs introduced by coercion
+      list(~suppressWarnings(as.numeric(.)))   ## Warning: In evalq(as.numeric(G), <environment>) : NAs introduced by coercion
       ) %>%   
     mutate(
       player_team_num = paste0(Team, player_num), 
@@ -1355,9 +1389,9 @@ sc.event_summary <- function(game_id_fun, season_id_fun, event_summary_data, ros
     filter(!is.na(player)) %>% 
     mutate_at(
       vars(TOI_all, AVG, TOI_PP, TOI_SH, TOI_EV), 
-      funs(suppressWarnings(round(period_to_seconds(ms(.)) / 60, 2)))
+      list(~suppressWarnings(round(period_to_seconds(ms(.)) / 60, 2)))
       ) %>% 
-    mutate_all(funs(ifelse(is.na(.), 0, .))) %>% 
+    mutate_all(list(~ifelse(is.na(.), 0, .))) %>% 
     select(
       player, position, position_type, game_id, game_date, season, session, Team, Opponent, is_home, 
       TOI_all, TOI_EV, TOI_PP, TOI_SH, SHF, AVG, 
@@ -1469,11 +1503,11 @@ sc.prepare_events_HTM <- function(game_id_fun, season_id_fun, events_data, game_
     ungroup() %>% 
     mutate_at(
       vars(event_player_1:event_player_3), 
-      funs(gsub("#|\\s*", "", .))
+      list(~gsub("#|\\s*", "", .))
       ) %>% 
     mutate_at(
       vars(event_player_1:event_player_3),  ## remove event players for true team/bench penalties
-      funs(ifelse(grepl("[tT]oo\\s*many\\s*men|[A-Z]+\\s*[A-Z]+\\s*[bB]ench[(]", event_description), NA, .))
+      list(~ifelse(grepl("[tT]oo\\s*many\\s*men|[A-Z]+\\s*[A-Z]+\\s*[bB]ench[(]", event_description), NA, .))
       ) %>% 
     select(-c(home_skaters, away_skaters)) %>% 
     data.frame()
@@ -1693,7 +1727,7 @@ sc.shifts_parse <- function(game_id_fun, season_id_fun, shifts_list, roster_data
         data.frame()
       
       } %>% 
-      mutate_all(funs(ifelse(. == "", NA, .))) %>% 
+      mutate_all(list(~ifelse(. == "", NA, .))) %>% 
       select(7:9, 1:5), 
     
     ## Away Shifts
@@ -1714,7 +1748,7 @@ sc.shifts_parse <- function(game_id_fun, season_id_fun, shifts_list, roster_data
         data.frame()
       
       } %>% 
-      mutate_all(funs(ifelse(. == "", NA, .))) %>% 
+      mutate_all(list(~ifelse(. == "", NA, .))) %>% 
       select(7:9, 1:5)
     
     ) %>% 
@@ -1849,7 +1883,7 @@ sc.shifts_parse <- function(game_id_fun, season_id_fun, shifts_list, roster_data
       } %>% 
       mutate_at(
         vars(X1:X7), 
-        funs(gsub("\\s", NA, .))  ## turn blanks into NAs
+        list(~gsub("\\s", NA, .))  ## turn blanks into NAs
         ),  
     
     ## Away Period Sums
@@ -1871,7 +1905,7 @@ sc.shifts_parse <- function(game_id_fun, season_id_fun, shifts_list, roster_data
       } %>% 
       mutate_at(
         vars(X1:X7), 
-        funs(gsub("\\s", NA, .))  ## turn blanks into NAs
+        list(~gsub("\\s", NA, .))  ## turn blanks into NAs
         )
     
     )
@@ -1896,11 +1930,11 @@ sc.shifts_parse <- function(game_id_fun, season_id_fun, shifts_list, roster_data
       ) %>% 
     mutate_at(
       vars(Per, SHF), 
-      funs(suppressWarnings(as.numeric(.)))
+      list(~suppressWarnings(as.numeric(.)))
       ) %>% 
     mutate_at(
       vars(AVG, TOI, EV_TOT, PP_TOT, SH_TOT), 
-      funs(suppressWarnings(round(period_to_seconds(ms(.)) / 60, 2)))  ## convert "00:00" format to minutes
+      list(~suppressWarnings(round(period_to_seconds(ms(.)) / 60, 2)))  ## convert "00:00" format to minutes
       ) %>% 
     select(
       player, num_last_first, player_team_num, position, position_type, 
@@ -2226,7 +2260,7 @@ sc.shifts_finalize <- function(game_id_fun, shifts_parse_data, events_data_HTM, 
         start_all = first(seconds), 
         end_all =   last(seconds)
         ) %>% 
-      summarise_at(vars(start_all, end_all), funs(first)) %>% 
+      summarise_at(vars(start_all, end_all), list(~first(.))) %>% 
       group_by(game_period, is_home) %>% 
       mutate(check = 1 * ((((start_all + 1200) / 1200) == game_period) & start_all < end_all)) %>%  ## verify shift_start == period start / verify shift_start before shift_end
       data.frame()
@@ -2581,7 +2615,7 @@ sc.shifts_create_events <- function(shifts_final_data) {
         ) %>% 
       summarise_at(
         vars(num, players), 
-        funs(first(.))
+        list(~first(.))
         ) %>% 
       mutate(event_type = "ON") %>% 
       rename(game_seconds = seconds_start) %>% 
@@ -2600,7 +2634,7 @@ sc.shifts_create_events <- function(shifts_final_data) {
         ) %>% 
       summarise_at(
         vars(num, players), 
-        funs(first(.))
+        list(~first(.))
         ) %>% 
       mutate(event_type = "OFF") %>% 
       rename(game_seconds = seconds_end) %>% 
@@ -2863,7 +2897,7 @@ sc.join_coordinates_ESPN <- function(season_id_fun, events_data_ESPN, events_dat
       ) %>% 
     mutate_at(
       vars(coords_x, coords_y, game_period), 
-      funs(as.numeric(.))
+      list(~as.numeric(.))
       ) %>% 
     mutate(
       game_seconds = suppressWarnings(period_to_seconds(ms(time))), 
@@ -3350,7 +3384,7 @@ sc.pbp_finalize <- function(pbp_data, on_data_home, on_data_away, roster_data, g
     ## Fix skaters for penalty shots
     mutate_at(
       vars(home_on_1:home_on_7, away_on_1:away_on_7), 
-      funs(ifelse(grepl("penalty shot", tolower(event_description)) & . != event_player_1 & . != home_goalie & . != away_goalie, NA, .))
+      list(~ifelse(grepl("penalty shot", tolower(event_description)) & . != event_player_1 & . != home_goalie & . != away_goalie, NA, .))
       ) %>% 
     mutate(
       home_skaters = 7 - 
@@ -4169,7 +4203,7 @@ sc.player_info_API <- function(season_id_fun) {
         playerPositionCode, playerShootsCatches, playerBirthCity, playerBirthCountry, # playerTeamsPlayedFor, 
         playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerHeight, playerWeight
         ), 
-      funs(gsub("player", "", .))
+      list(~gsub("player", "", .))
       ) %>%  
     mutate(
       position_type = ifelse(PositionCode == "D", "D", "F"),
@@ -4241,7 +4275,7 @@ sc.player_info_API <- function(season_id_fun) {
         playerPositionCode, playerShootsCatches, playerBirthCity, playerBirthCountry, #playerTeamsPlayedFor, 
         playerDraftOverallPickNo, playerDraftRoundNo, playerDraftYear, playerHeight, playerWeight
         ), 
-      funs(gsub("player", "", .))
+      list(~gsub("player", "", .))
       ) %>% 
     mutate(
       position_type = "G",
