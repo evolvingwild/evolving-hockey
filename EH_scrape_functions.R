@@ -1627,6 +1627,7 @@ sc.prepare_events_API <- function(game_id_fun, events_data_API, game_info_data) 
         eventIdx =       i,  
         event_player_1 = as.character(events_players_list_API[[i]]$player$id[1]), 
         event_player_2 = as.character(events_players_list_API[[i]]$player$id[2]), 
+        event_player_3 = as.character(events_players_list_API[[i]]$player$id[3]), 
         stringsAsFactors = FALSE
         )
       
@@ -1636,6 +1637,7 @@ sc.prepare_events_API <- function(game_id_fun, events_data_API, game_info_data) 
           eventIdx =       i,  
           event_player_1 = NA, 
           event_player_2 = NA, 
+          event_player_3 = NA, 
           stringsAsFactors = FALSE
           )
       
@@ -1644,7 +1646,8 @@ sc.prepare_events_API <- function(game_id_fun, events_data_API, game_info_data) 
     } %>% 
     mutate(
       event_player_1 = roster_data_API$player_team_num[match(event_player_1, roster_data_API$player_ID)], 
-      event_player_2 = roster_data_API$player_team_num[match(event_player_2, roster_data_API$player_ID)]
+      event_player_2 = roster_data_API$player_team_num[match(event_player_2, roster_data_API$player_ID)], 
+      event_player_3 = roster_data_API$player_team_num[match(event_player_3, roster_data_API$player_ID)]
       ) %>% 
     data.frame()
   
@@ -1676,7 +1679,10 @@ sc.prepare_events_API <- function(game_id_fun, events_data_API, game_info_data) 
         )
                           
       ) %>% 
-    select(game_period, game_seconds, event_type, event_team, event_description, coords_x, coords_y, event_player_1) %>% 
+    select(
+      game_period, game_seconds, event_type, event_team, event_description, coords_x, coords_y, 
+      event_player_1, event_player_2, event_player_3, 
+      ) %>% 
     data.frame()
   
   }
