@@ -6,6 +6,8 @@
 
 The `sc.scrape_pbp` function is used to scrape one or more games from the NHL's publicly available data. A list is returned with data that is requested. 
 
+The "EH_scrape_functions.R" script contains all necessary code to use the `sc.scrape_pbp` function.
+
 Example:
 
 ``` {r}
