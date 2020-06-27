@@ -2681,7 +2681,10 @@ sc.join_coordinates_API <- function(events_data_API, events_data_HTM) {
     filter(event_type %in% unique(na.omit(pbp_JSON_events$event_type))) %>% 
     left_join(
       pbp_JSON_events %>% 
-        select(-c(event_player_1)) %>% 
+        
+        # select(-c(event_player_1)) %>% 
+        select(-c(event_player_1, event_player_2, event_player_3)) %>%   ## *** testing after adding event_player 2 and 3 to api data
+        
         filter(group_count == 1),  ## filter out concurrent events
       by = c("game_period", "game_seconds", "event_type", "event_team")
       ) %>% 
@@ -2702,6 +2705,9 @@ sc.join_coordinates_API <- function(events_data_API, events_data_HTM) {
     
     ## Prepare concurrent events data (JSON)
     pbp_JSON_events_prob <- pbp_JSON_events %>% 
+      
+      select(-c(event_player_2, event_player_3)) %>%   ## *** testing after adding event_player 2 and 3 to api data
+      
       filter(
         group_count > 1,           ## only act on problem rows
         event_type != "PENL"       ## not adding coordinates for concurrent penalties
