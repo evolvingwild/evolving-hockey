@@ -2,7 +2,10 @@
 #####         Evolving-Hockey Scraper         ||          2019-05-18          #####
 ###################################################################################
 
-## Current as of: R version 3.6.0 (2019-04-26)
+## Current as of: R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
+##
+## Tidyverse package version: 1.3.0
+## dplyr package version: 0.8.3
 
 
 ## Dependencies
