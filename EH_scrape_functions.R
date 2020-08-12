@@ -1459,6 +1459,8 @@ sc.prepare_events_HTM <- function(game_id_fun, season_id_fun, events_data, game_
         game_period == 5 & game_info_data$session == "P" ~ game_seconds + 4800, 
         game_period == 6 & game_info_data$session == "P" ~ game_seconds + 6000, 
         game_period == 7 & game_info_data$session == "P" ~ game_seconds + 7200, 
+        game_period == 8 & game_info_data$session == "P" ~ game_seconds + 8400, 
+        game_period == 9 & game_info_data$session == "P" ~ game_seconds + 9600, 
         TRUE ~ game_seconds
         ), 
       home_team =    game_info_data$home_team, 
@@ -1566,6 +1568,8 @@ sc.prepare_events_API <- function(game_id_fun, events_data_API, game_info_data) 
         game_period == 5 & game_info_data$session == "P" ~ game_seconds + 4800, 
         game_period == 6 & game_info_data$session == "P" ~ game_seconds + 6000, 
         game_period == 7 & game_info_data$session == "P" ~ game_seconds + 7200, 
+        game_period == 8 & game_info_data$session == "P" ~ game_seconds + 8400, 
+        game_period == 9 & game_info_data$session == "P" ~ game_seconds + 9600, 
         TRUE ~ game_seconds
         ), 
       event_type = toupper(gsub("gamecenter", "", event_type)),  ## remove excessive "gamecenter" text and ensure capitalization
@@ -1824,6 +1828,8 @@ sc.shifts_parse <- function(game_id_fun, season_id_fun, shifts_list, roster_data
         game_period == 5 & game_info_data$session == "P" ~ seconds_start + 4800, 
         game_period == 6 & game_info_data$session == "P" ~ seconds_start + 6000, 
         game_period == 7 & game_info_data$session == "P" ~ seconds_start + 7200, 
+        game_period == 8 & game_info_data$session == "P" ~ seconds_start + 8400, 
+        game_period == 9 & game_info_data$session == "P" ~ seconds_start + 9600, 
         TRUE ~ seconds_start
         ),
       shift_end =     gsub(" / .*", "", shift_end), 
@@ -1836,6 +1842,8 @@ sc.shifts_parse <- function(game_id_fun, season_id_fun, shifts_list, roster_data
         game_period == 5 & game_info_data$session == "P" ~ seconds_end + 4800, 
         game_period == 6 & game_info_data$session == "P" ~ seconds_end + 6000, 
         game_period == 7 & game_info_data$session == "P" ~ seconds_end + 7200, 
+        game_period == 8 & game_info_data$session == "P" ~ seconds_end + 8400, 
+        game_period == 9 & game_info_data$session == "P" ~ seconds_end + 9600, 
         TRUE ~ seconds_end
         ), 
       seconds_duration = seconds_end - seconds_start
@@ -2078,6 +2086,8 @@ sc.shifts_parse_API <- function(game_id_fun, shifts_list, roster_data, game_info
         game_period == 5 & game_info_data$session == "P" ~ seconds_start + 4800, 
         game_period == 6 & game_info_data$session == "P" ~ seconds_start + 6000, 
         game_period == 7 & game_info_data$session == "P" ~ seconds_start + 7200, 
+        game_period == 8 & game_info_data$session == "P" ~ seconds_start + 8400, 
+        game_period == 9 & game_info_data$session == "P" ~ seconds_start + 9600, 
         TRUE ~ seconds_start
         ), 
       seconds_end = suppressWarnings(period_to_seconds(ms(endTime))), 
@@ -2089,6 +2099,8 @@ sc.shifts_parse_API <- function(game_id_fun, shifts_list, roster_data, game_info
         game_period == 5 & game_info_data$session == "P" ~ seconds_end + 4800, 
         game_period == 6 & game_info_data$session == "P" ~ seconds_end + 6000, 
         game_period == 7 & game_info_data$session == "P" ~ seconds_end + 7200, 
+        game_period == 8 & game_info_data$session == "P" ~ seconds_end + 8400, 
+        game_period == 9 & game_info_data$session == "P" ~ seconds_end + 9600, 
         TRUE ~ seconds_end
         ), 
       seconds_duration = seconds_end - seconds_start
