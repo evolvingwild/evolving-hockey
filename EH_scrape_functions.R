@@ -1,5 +1,5 @@
 ###################################################################################
-#####         Evolving-Hockey Scraper         ||          2019-05-18          #####
+#####                         Evolving-Hockey Scraper                         #####
 ###################################################################################
 
 ## Current as of: R version 3.6.2 (2019-12-12) -- "Dark and Stormy Night"
@@ -19,10 +19,6 @@ options(
   scipen = 999, 
   stringsAsFactors = FALSE
   )
-
-
-
-## *** Notes & examples provided below all functions
 
 
 
