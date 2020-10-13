@@ -2381,11 +2381,13 @@ sc.shifts_finalize <- function(game_id_fun, shifts_parse_data, events_data_HTM, 
             data.frame()
           
           } else {
-            new_goalie_shift_home <- data.frame(matrix(
-              ncol = ncol(shifts_parsed), 
-              nrow = 0
-              ))
-            colnames(new_goalie_shift_home) <- colnames(shifts_parsed)
+            # new_goalie_shift_home <- data.frame(matrix(
+            #   ncol = ncol(shifts_parsed), 
+            #   nrow = 0
+            #   ))
+            # colnames(new_goalie_shift_home) <- colnames(shifts_parsed)
+            
+            new_goalie_shift_home <- data.frame()
           
             }
         
@@ -2464,11 +2466,13 @@ sc.shifts_finalize <- function(game_id_fun, shifts_parse_data, events_data_HTM, 
             data.frame()
           
           } else {
-            new_goalie_shift_away <- data.frame(matrix(
-              ncol = ncol(shifts_parsed), 
-              nrow = 0
-              ))
-            colnames(new_goalie_shift_away) <- colnames(shifts_parsed)
+            # new_goalie_shift_away <- data.frame(matrix(
+            #   ncol = ncol(shifts_parsed), 
+            #   nrow = 0
+            #   ))
+            # colnames(new_goalie_shift_away) <- colnames(shifts_parsed)
+            
+            new_goalie_shift_away <- data.frame()
           
             }
         
@@ -3294,7 +3298,8 @@ sc.pbp_combine <- function(events_data, shifts_data, roster_data, game_info_data
       home_on_4 = colnames(is_on_matrix_home)[unique(col)[4]],
       home_on_5 = colnames(is_on_matrix_home)[unique(col)[5]],
       home_on_6 = colnames(is_on_matrix_home)[unique(col)[6]], 
-      home_on_7 = colnames(is_on_matrix_home)[unique(col)[7]]
+      home_on_7 = colnames(is_on_matrix_home)[unique(col)[7]], 
+      .groups = "drop"  ## added to prevent warning message in scraper verbose output
       ) %>%
     data.frame()
   
@@ -3311,7 +3316,8 @@ sc.pbp_combine <- function(events_data, shifts_data, roster_data, game_info_data
       away_on_4 = colnames(is_on_matrix_away)[unique(col)[4]],
       away_on_5 = colnames(is_on_matrix_away)[unique(col)[5]],
       away_on_6 = colnames(is_on_matrix_away)[unique(col)[6]], 
-      away_on_7 = colnames(is_on_matrix_away)[unique(col)[7]]
+      away_on_7 = colnames(is_on_matrix_away)[unique(col)[7]], 
+      .groups = "drop"  ## added to prevent warning message in scraper verbose output
       ) %>%
     data.frame()
   
