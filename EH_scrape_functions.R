@@ -419,7 +419,7 @@ sc.scrape_events_ESPN <- function(game_id_fun, season_id_fun, game_info_data, at
   ## Get partial team names data frame
   part_team_names <- full_team_names %>% 
     group_by(Team, partTeam) %>% 
-    summarise() %>% 
+    summarise(.groups = "drop") %>%  ## added to prevent message displayed in console
     data.frame()
   
   
