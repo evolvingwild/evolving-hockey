@@ -2,7 +2,7 @@
 #####                         Evolving-Hockey Scraper                         #####
 ###################################################################################
 
-## Current as of: R version 4.0.2 (2020-06-22) -- "Taking Off Again"
+## Current as of: R version 4.0.3 (2020-10-10) # -- "Bunny-Wunnies Freak Out"
 ##
 ## Tidyverse package version: 1.3.0
 ## dplyr package version: 1.0.2
