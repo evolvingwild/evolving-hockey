@@ -1030,6 +1030,9 @@ sc.update_names_HTM <- function(data, col_name) {
         player_name == "NICHOLAS.SHORE" ~ "NICK.SHORE",
         player_name == "T.J..TYNAN" ~ "TJ.TYNAN",
         
+        ## '20-21
+        player_name == "EGOR.SHARANGOVICH" ~ "YEGOR.SHARANGOVICH",
+        
         TRUE ~ player_name
         )
       ) %>% 
