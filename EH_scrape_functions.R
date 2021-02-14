@@ -876,181 +876,6 @@ sc.game_info <- function(game_id_fun, season_id_fun, events_data, roster_data) {
   
   }
 
-## Fix Player Names - HTM
-sc.update_names_HTM <- function(data, col_name) { 
-  
-  ## Handle input column name
-  hold_name <- as.name(col_name)
-  
-  data <- data %>% 
-    mutate(player_name = !!hold_name)
-  
-  
-  ## Find and modify incorrect player names
-  fixed_names_df <- data %>% 
-    mutate(
-      ## Global name changes
-      player_name = case_when(
-        grepl("^ALEXANDER.|^ALEXANDRE.", player_name) ~ gsub("^ALEXANDER.|^ALEXANDRE.", "ALEX.", player_name), 
-        grepl("^CHRISTOPHER.", player_name) ~ gsub("^CHRISTOPHER.", "CHRIS.", player_name), 
-        TRUE ~ player_name
-        ), 
-      ## Specific name changes
-      player_name = case_when(
-        player_name == "ANDREI.KASTSITSYN" ~ "ANDREI.KOSTITSYN",
-        player_name == "AJ.GREER" ~ "A.J..GREER",
-        player_name == "ANDREW.GREENE" ~ "ANDY.GREENE",
-        player_name == "ANDREW.WOZNIEWSKI" ~ "ANDY.WOZNIEWSKI", 
-        player_name == "ANTHONY.DEANGELO" ~ "TONY.DEANGELO",
-        player_name == "BATES (JON).BATTAGLIA" ~ "BATES.BATTAGLIA",
-        player_name %in% c("BJ.CROMBEEN", "B.J.CROMBEEN", "BRANDON.CROMBEEN") ~ "B.J..CROMBEEN", 
-        player_name == "BRADLEY.MILLS" ~ "BRAD.MILLS",
-        player_name == "CAMERON.BARKER" ~ "CAM.BARKER", 
-        player_name == "COLIN (JOHN).WHITE" ~ "COLIN.WHITE",
-        player_name == "CRISTOVAL.NIEVES" ~ "BOO.NIEVES",
-        player_name == "CHRIS.VANDE VELDE" ~ "CHRIS.VANDEVELDE", 
-        player_name == "DANNY.BRIERE" ~ "DANIEL.BRIERE",
-        player_name %in% c("DAN.CLEARY", "DANNY.CLEARY") ~ "DANIEL.CLEARY",
-        player_name == "DANIEL.GIRARDI" ~ "DAN.GIRARDI", 
-        player_name == "DANNY.O'REGAN" ~ "DANIEL.O'REGAN",
-        player_name == "DANIEL.CARCILLO" ~ "DAN.CARCILLO", 
-        player_name == "DAVID JOHNNY.ODUYA" ~ "JOHNNY.ODUYA", 
-        player_name == "DAVID.BOLLAND" ~ "DAVE.BOLLAND", 
-        player_name == "DENIS JR..GAUTHIER" ~ "DENIS.GAUTHIER",
-        player_name == "DWAYNE.KING" ~ "DJ.KING", 
-        player_name == "EDWARD.PURCELL" ~ "TEDDY.PURCELL", 
-        player_name == "EMMANUEL.FERNANDEZ" ~ "MANNY.FERNANDEZ", 
-        player_name == "EMMANUEL.LEGACE" ~ "MANNY.LEGACE", 
-        player_name == "EVGENII.DADONOV" ~ "EVGENY.DADONOV", 
-        player_name == "FREDDY.MODIN" ~ "FREDRIK.MODIN", 
-        player_name == "FREDERICK.MEYER IV" ~ "FREDDY.MEYER",
-        player_name == "HARRISON.ZOLNIERCZYK" ~ "HARRY.ZOLNIERCZYK", 
-        player_name == "ILJA.BRYZGALOV" ~ "ILYA.BRYZGALOV", 
-        player_name == "JACOB.DOWELL" ~ "JAKE.DOWELL",
-        player_name == "JAMES.HOWARD" ~ "JIMMY.HOWARD", 
-        player_name == "JAMES.VANDERMEER" ~ "JIM.VANDERMEER",
-        player_name == "JAMES.WYMAN" ~ "JT.WYMAN",
-        player_name == "JOHN.HILLEN III" ~ "JACK.HILLEN",
-        player_name == "JOHN.ODUYA" ~ "JOHNNY.ODUYA",
-        player_name == "JOHN.PEVERLEY" ~ "RICH.PEVERLEY",
-        player_name == "JONATHAN.SIM" ~ "JON.SIM",
-        player_name == "JONATHON.KALINSKI" ~ "JON.KALINSKI",
-        player_name == "JONATHAN.AUDY-MARCHESSAULT" ~ "JONATHAN.MARCHESSAULT", 
-        player_name == "JOSEPH.CRABB" ~ "JOEY.CRABB",
-        player_name == "JOSEPH.CORVO" ~ "JOE.CORVO", 
-        player_name == "JOSHUA.BAILEY" ~ "JOSH.BAILEY",
-        player_name == "JOSHUA.HENNESSY" ~ "JOSH.HENNESSY", 
-        player_name == "JOSHUA.MORRISSEY" ~ "JOSH.MORRISSEY",
-        player_name == "JEAN-FRANCOIS.JACQUES" ~ "J-F.JACQUES", 
-        player_name %in% c("J P.DUMONT", "JEAN-PIERRE.DUMONT") ~ "J-P.DUMONT", 
-        player_name == "JT.COMPHER" ~ "J.T..COMPHER",
-        player_name == "KRISTOPHER.LETANG" ~ "KRIS.LETANG", 
-        player_name == "KRYSTOFER.BARCH" ~ "KRYS.BARCH", 
-        player_name == "KRYSTOFER.KOLANOS" ~ "KRYS.KOLANOS",
-        player_name == "MARC.POULIOT" ~ "MARC-ANTOINE.POULIOT",
-        player_name == "MARTIN.ST LOUIS" ~ "MARTIN.ST. LOUIS", 
-        player_name == "MARTIN.ST PIERRE" ~ "MARTIN.ST. PIERRE",
-        player_name == "MARTY.HAVLAT" ~ "MARTIN.HAVLAT",
-        player_name == "MATTHEW.CARLE" ~ "MATT.CARLE", 
-        player_name == "MATHEW.DUMBA" ~ "MATT.DUMBA",
-        player_name == "MATTHEW.BENNING" ~ "MATT.BENNING", 
-        player_name == "MATTHEW.IRWIN" ~ "MATT.IRWIN",
-        player_name == "MATTHEW.NIETO" ~ "MATT.NIETO",
-        player_name == "MATTHEW.STAJAN" ~ "MATT.STAJAN",
-        player_name == "MAXIM.MAYOROV" ~ "MAKSIM.MAYOROV",
-        player_name == "MAXIME.TALBOT" ~ "MAX.TALBOT", 
-        player_name == "MAXWELL.REINHART" ~ "MAX.REINHART",
-        player_name == "MICHAEL.BLUNDEN" ~ "MIKE.BLUNDEN",
-        player_name == "MICHAËL.BOURNIVAL" ~ "MICHAEL.BOURNIVAL",
-        player_name == "MICHAEL.CAMMALLERI" ~ "MIKE.CAMMALLERI", 
-        player_name == "MICHAEL.FERLAND" ~ "MICHEAL.FERLAND", 
-        player_name == "MICHAEL.GRIER" ~ "MIKE.GRIER",
-        player_name == "MICHAEL.KNUBLE" ~ "MIKE.KNUBLE",
-        player_name == "MICHAEL.KOMISAREK" ~ "MIKE.KOMISAREK",
-        player_name == "MICHAEL.MATHESON" ~ "MIKE.MATHESON",
-        player_name == "MICHAEL.MODANO" ~ "MIKE.MODANO",
-        player_name == "MICHAEL.RUPP" ~ "MIKE.RUPP",
-        player_name == "MICHAEL.SANTORELLI" ~ "MIKE.SANTORELLI", 
-        player_name == "MICHAEL.SILLINGER" ~ "MIKE.SILLINGER",
-        player_name == "MITCHELL.MARNER" ~ "MITCH.MARNER", 
-        player_name == "NATHAN.GUENIN" ~ "NATE.GUENIN",
-        player_name == "NICHOLAS.BOYNTON" ~ "NICK.BOYNTON",
-        player_name == "NICHOLAS.DRAZENOVIC" ~ "NICK.DRAZENOVIC", 
-        player_name == "NICKLAS.BERGFORS" ~ "NICLAS.BERGFORS",
-        player_name == "NICKLAS.GROSSMAN" ~ "NICKLAS.GROSSMANN", 
-        player_name == "NICOLAS.PETAN" ~ "NIC.PETAN", 
-        player_name == "NIKLAS.KRONVALL" ~ "NIKLAS.KRONWALL",
-        player_name == "NIKOLAI.ANTROPOV" ~ "NIK.ANTROPOV",
-        player_name == "NIKOLAI.KULEMIN" ~ "NIKOLAY.KULEMIN", 
-        player_name == "NIKOLAI.ZHERDEV" ~ "NIKOLAY.ZHERDEV",
-        player_name == "OLIVIER.MAGNAN-GRENIER" ~ "OLIVIER.MAGNAN",
-        player_name == "PAT.MAROON" ~ "PATRICK.MAROON", 
-        player_name %in% c("P. J..AXELSSON", "PER JOHAN.AXELSSON") ~ "P.J..AXELSSON",
-        player_name %in% c("PK.SUBBAN", "P.K.SUBBAN") ~ "P.K..SUBBAN", 
-        player_name %in% c("PIERRE.PARENTEAU", "PIERRE-ALEX.PARENTEAU", "PIERRE-ALEXANDRE.PARENTEAU", "PA.PARENTEAU", "P.A.PARENTEAU", "P-A.PARENTEAU") ~ "P.A..PARENTEAU", 
-        player_name == "PHILIP.VARONE" ~ "PHIL.VARONE",
-        player_name == "QUINTIN.HUGHES" ~ "QUINN.HUGHES",
-        player_name == "RAYMOND.MACIAS" ~ "RAY.MACIAS",
-        player_name == "RJ.UMBERGER" ~ "R.J..UMBERGER",
-        player_name == "ROBERT.BLAKE" ~ "ROB.BLAKE",
-        player_name == "ROBERT.EARL" ~ "ROBBIE.EARL",
-        player_name == "ROBERT.HOLIK" ~ "BOBBY.HOLIK",
-        player_name == "ROBERT.SCUDERI" ~ "ROB.SCUDERI",
-        player_name == "RODNEY.PELLEY" ~ "ROD.PELLEY",
-        player_name == "SIARHEI.KASTSITSYN" ~ "SERGEI.KOSTITSYN",
-        player_name == "SIMEON.VARLAMOV" ~ "SEMYON.VARLAMOV", 
-        player_name == "STAFFAN.KRONVALL" ~ "STAFFAN.KRONWALL",
-        player_name == "STEVEN.REINPRECHT" ~ "STEVE.REINPRECHT",
-        player_name == "TJ.GALIARDI" ~ "T.J..GALIARDI",
-        player_name == "TJ.HENSICK" ~ "T.J..HENSICK",
-        player_name %in% c("TJ.OSHIE", "T.J.OSHIE") ~ "T.J..OSHIE", 
-        player_name == "TOBY.ENSTROM" ~ "TOBIAS.ENSTROM", 
-        player_name == "TOMMY.SESTITO" ~ "TOM.SESTITO",
-        player_name == "VACLAV.PROSPAL" ~ "VINNY.PROSPAL",
-        player_name == "VINCENT.HINOSTROZA" ~ "VINNIE.HINOSTROZA",
-        player_name == "WILLIAM.THOMAS" ~ "BILL.THOMAS",
-        player_name == "ZACHARY.ASTON-REESE" ~ "ZACH.ASTON-REESE",
-        player_name == "ZACHARY.SANFORD" ~ "ZACH.SANFORD",
-        player_name == "ZACHERY.STORTINI" ~ "ZACK.STORTINI",
-        
-        ## NEW CHANGES
-        player_name == "MATTHEW.MURRAY" ~ "MATT.MURRAY",
-        player_name == "J-SEBASTIEN.AUBIN" ~ "JEAN-SEBASTIEN.AUBIN",
-        player_name %in% c("J.F..BERUBE", "JEAN-FRANCOIS.BERUBE") ~ "J-F.BERUBE", 
-        player_name == "JEFF.DROUIN-DESLAURIERS" ~ "JEFF.DESLAURIERS", 
-        player_name == "NICHOLAS.BAPTISTE" ~ "NICK.BAPTISTE",
-        player_name == "OLAF.KOLZIG" ~ "OLIE.KOLZIG",
-        player_name == "STEPHEN.VALIQUETTE" ~ "STEVE.VALIQUETTE",
-        player_name == "THOMAS.MCCOLLUM" ~ "TOM.MCCOLLUM",
-        player_name == "TIMOTHY JR..THOMAS" ~ "TIM.THOMAS",
-        ## '19-20
-        player_name == "TIM.GETTINGER" ~ "TIMOTHY.GETTINGER",
-        
-        ## Testing
-        player_name == "NICHOLAS.SHORE" ~ "NICK.SHORE",
-        player_name == "T.J..TYNAN" ~ "TJ.TYNAN",
-        
-        ## '20-21
-        player_name == "EGOR.SHARANGOVICH" ~ "YEGOR.SHARANGOVICH",
-        player_name == "ALEXIS.LAFRENI?RE" ~ "ALEXIS.LAFRENIÈRE",
-        player_name == "ALEXIS.LAFRENIERE" ~ "ALEXIS.LAFRENIÈRE",
-        
-        TRUE ~ player_name
-        )
-      ) %>% 
-    data.frame()
-  
-  ## Replace original column with newly created column 
-  fixed_names_df[[col_name]] <- fixed_names_df$player_name
-  
-  ## Return data
-  return(
-    fixed_names_df %>% 
-      select(-player_name)
-    )
-  
-  }
-
 ## Create Rosters data.frame
 sc.roster_info <- function(game_id_fun, season_id_fun, roster_data, game_info_data, shifts_list) { 
   
@@ -4069,6 +3894,182 @@ sc.scrape_pbp <- function(games, scrape_type = "full", live_scrape = FALSE, verb
 ##   Additional Data Functions   ##
 ## ----------------------------- ##
 
+## Fix Player Names - HTM
+sc.update_names_HTM <- function(data, col_name) { 
+  
+  ## Handle input column name
+  hold_name <- as.name(col_name)
+  
+  data <- data %>% 
+    mutate(player_name = !!hold_name)
+  
+  
+  ## Find and modify incorrect player names
+  fixed_names_df <- data %>% 
+    mutate(
+      ## Global name changes
+      player_name = case_when(
+        grepl("^ALEXANDER.|^ALEXANDRE.", player_name) ~ gsub("^ALEXANDER.|^ALEXANDRE.", "ALEX.", player_name), 
+        grepl("^CHRISTOPHER.", player_name) ~ gsub("^CHRISTOPHER.", "CHRIS.", player_name), 
+        TRUE ~ player_name
+        ), 
+      ## Specific name changes
+      player_name = case_when(
+        player_name == "ANDREI.KASTSITSYN" ~ "ANDREI.KOSTITSYN",
+        player_name == "AJ.GREER" ~ "A.J..GREER",
+        player_name == "ANDREW.GREENE" ~ "ANDY.GREENE",
+        player_name == "ANDREW.WOZNIEWSKI" ~ "ANDY.WOZNIEWSKI", 
+        player_name == "ANTHONY.DEANGELO" ~ "TONY.DEANGELO",
+        player_name == "BATES (JON).BATTAGLIA" ~ "BATES.BATTAGLIA",
+        player_name %in% c("BJ.CROMBEEN", "B.J.CROMBEEN", "BRANDON.CROMBEEN") ~ "B.J..CROMBEEN", 
+        player_name == "BRADLEY.MILLS" ~ "BRAD.MILLS",
+        player_name == "CAMERON.BARKER" ~ "CAM.BARKER", 
+        player_name == "COLIN (JOHN).WHITE" ~ "COLIN.WHITE",
+        player_name == "CRISTOVAL.NIEVES" ~ "BOO.NIEVES",
+        player_name == "CHRIS.VANDE VELDE" ~ "CHRIS.VANDEVELDE", 
+        player_name == "DANNY.BRIERE" ~ "DANIEL.BRIERE",
+        player_name %in% c("DAN.CLEARY", "DANNY.CLEARY") ~ "DANIEL.CLEARY",
+        player_name == "DANIEL.GIRARDI" ~ "DAN.GIRARDI", 
+        player_name == "DANNY.O'REGAN" ~ "DANIEL.O'REGAN",
+        player_name == "DANIEL.CARCILLO" ~ "DAN.CARCILLO", 
+        player_name == "DAVID JOHNNY.ODUYA" ~ "JOHNNY.ODUYA", 
+        player_name == "DAVID.BOLLAND" ~ "DAVE.BOLLAND", 
+        player_name == "DENIS JR..GAUTHIER" ~ "DENIS.GAUTHIER",
+        player_name == "DWAYNE.KING" ~ "DJ.KING", 
+        player_name == "EDWARD.PURCELL" ~ "TEDDY.PURCELL", 
+        player_name == "EMMANUEL.FERNANDEZ" ~ "MANNY.FERNANDEZ", 
+        player_name == "EMMANUEL.LEGACE" ~ "MANNY.LEGACE", 
+        player_name == "EVGENII.DADONOV" ~ "EVGENY.DADONOV", 
+        player_name == "FREDDY.MODIN" ~ "FREDRIK.MODIN", 
+        player_name == "FREDERICK.MEYER IV" ~ "FREDDY.MEYER",
+        player_name == "HARRISON.ZOLNIERCZYK" ~ "HARRY.ZOLNIERCZYK", 
+        player_name == "ILJA.BRYZGALOV" ~ "ILYA.BRYZGALOV", 
+        player_name == "JACOB.DOWELL" ~ "JAKE.DOWELL",
+        player_name == "JAMES.HOWARD" ~ "JIMMY.HOWARD", 
+        player_name == "JAMES.VANDERMEER" ~ "JIM.VANDERMEER",
+        player_name == "JAMES.WYMAN" ~ "JT.WYMAN",
+        player_name == "JOHN.HILLEN III" ~ "JACK.HILLEN",
+        player_name == "JOHN.ODUYA" ~ "JOHNNY.ODUYA",
+        player_name == "JOHN.PEVERLEY" ~ "RICH.PEVERLEY",
+        player_name == "JONATHAN.SIM" ~ "JON.SIM",
+        player_name == "JONATHON.KALINSKI" ~ "JON.KALINSKI",
+        player_name == "JONATHAN.AUDY-MARCHESSAULT" ~ "JONATHAN.MARCHESSAULT", 
+        player_name == "JOSEPH.CRABB" ~ "JOEY.CRABB",
+        player_name == "JOSEPH.CORVO" ~ "JOE.CORVO", 
+        player_name == "JOSHUA.BAILEY" ~ "JOSH.BAILEY",
+        player_name == "JOSHUA.HENNESSY" ~ "JOSH.HENNESSY", 
+        player_name == "JOSHUA.MORRISSEY" ~ "JOSH.MORRISSEY",
+        player_name == "JEAN-FRANCOIS.JACQUES" ~ "J-F.JACQUES", 
+        player_name %in% c("J P.DUMONT", "JEAN-PIERRE.DUMONT") ~ "J-P.DUMONT", 
+        player_name == "JT.COMPHER" ~ "J.T..COMPHER",
+        player_name == "KRISTOPHER.LETANG" ~ "KRIS.LETANG", 
+        player_name == "KRYSTOFER.BARCH" ~ "KRYS.BARCH", 
+        player_name == "KRYSTOFER.KOLANOS" ~ "KRYS.KOLANOS",
+        player_name == "MARC.POULIOT" ~ "MARC-ANTOINE.POULIOT",
+        player_name == "MARTIN.ST LOUIS" ~ "MARTIN.ST. LOUIS", 
+        player_name == "MARTIN.ST PIERRE" ~ "MARTIN.ST. PIERRE",
+        player_name == "MARTY.HAVLAT" ~ "MARTIN.HAVLAT",
+        player_name == "MATTHEW.CARLE" ~ "MATT.CARLE", 
+        player_name == "MATHEW.DUMBA" ~ "MATT.DUMBA",
+        player_name == "MATTHEW.BENNING" ~ "MATT.BENNING", 
+        player_name == "MATTHEW.IRWIN" ~ "MATT.IRWIN",
+        player_name == "MATTHEW.NIETO" ~ "MATT.NIETO",
+        player_name == "MATTHEW.STAJAN" ~ "MATT.STAJAN",
+        player_name == "MAXIM.MAYOROV" ~ "MAKSIM.MAYOROV",
+        player_name == "MAXIME.TALBOT" ~ "MAX.TALBOT", 
+        player_name == "MAXWELL.REINHART" ~ "MAX.REINHART",
+        player_name == "MICHAEL.BLUNDEN" ~ "MIKE.BLUNDEN",
+        player_name == "MICHAËL.BOURNIVAL" ~ "MICHAEL.BOURNIVAL",
+        player_name == "MICHAEL.CAMMALLERI" ~ "MIKE.CAMMALLERI", 
+        player_name == "MICHAEL.FERLAND" ~ "MICHEAL.FERLAND", 
+        player_name == "MICHAEL.GRIER" ~ "MIKE.GRIER",
+        player_name == "MICHAEL.KNUBLE" ~ "MIKE.KNUBLE",
+        player_name == "MICHAEL.KOMISAREK" ~ "MIKE.KOMISAREK",
+        player_name == "MICHAEL.MATHESON" ~ "MIKE.MATHESON",
+        player_name == "MICHAEL.MODANO" ~ "MIKE.MODANO",
+        player_name == "MICHAEL.RUPP" ~ "MIKE.RUPP",
+        player_name == "MICHAEL.SANTORELLI" ~ "MIKE.SANTORELLI", 
+        player_name == "MICHAEL.SILLINGER" ~ "MIKE.SILLINGER",
+        player_name == "MITCHELL.MARNER" ~ "MITCH.MARNER", 
+        player_name == "NATHAN.GUENIN" ~ "NATE.GUENIN",
+        player_name == "NICHOLAS.BOYNTON" ~ "NICK.BOYNTON",
+        player_name == "NICHOLAS.DRAZENOVIC" ~ "NICK.DRAZENOVIC", 
+        player_name == "NICKLAS.BERGFORS" ~ "NICLAS.BERGFORS",
+        player_name == "NICKLAS.GROSSMAN" ~ "NICKLAS.GROSSMANN", 
+        player_name == "NICOLAS.PETAN" ~ "NIC.PETAN", 
+        player_name == "NIKLAS.KRONVALL" ~ "NIKLAS.KRONWALL",
+        player_name == "NIKOLAI.ANTROPOV" ~ "NIK.ANTROPOV",
+        player_name == "NIKOLAI.KULEMIN" ~ "NIKOLAY.KULEMIN", 
+        player_name == "NIKOLAI.ZHERDEV" ~ "NIKOLAY.ZHERDEV",
+        player_name == "OLIVIER.MAGNAN-GRENIER" ~ "OLIVIER.MAGNAN",
+        player_name == "PAT.MAROON" ~ "PATRICK.MAROON", 
+        player_name %in% c("P. J..AXELSSON", "PER JOHAN.AXELSSON") ~ "P.J..AXELSSON",
+        player_name %in% c("PK.SUBBAN", "P.K.SUBBAN") ~ "P.K..SUBBAN", 
+        player_name %in% c("PIERRE.PARENTEAU", "PIERRE-ALEX.PARENTEAU", "PIERRE-ALEXANDRE.PARENTEAU", "PA.PARENTEAU", "P.A.PARENTEAU", "P-A.PARENTEAU") ~ "P.A..PARENTEAU", 
+        player_name == "PHILIP.VARONE" ~ "PHIL.VARONE",
+        player_name == "QUINTIN.HUGHES" ~ "QUINN.HUGHES",
+        player_name == "RAYMOND.MACIAS" ~ "RAY.MACIAS",
+        player_name == "RJ.UMBERGER" ~ "R.J..UMBERGER",
+        player_name == "ROBERT.BLAKE" ~ "ROB.BLAKE",
+        player_name == "ROBERT.EARL" ~ "ROBBIE.EARL",
+        player_name == "ROBERT.HOLIK" ~ "BOBBY.HOLIK",
+        player_name == "ROBERT.SCUDERI" ~ "ROB.SCUDERI",
+        player_name == "RODNEY.PELLEY" ~ "ROD.PELLEY",
+        player_name == "SIARHEI.KASTSITSYN" ~ "SERGEI.KOSTITSYN",
+        player_name == "SIMEON.VARLAMOV" ~ "SEMYON.VARLAMOV", 
+        player_name == "STAFFAN.KRONVALL" ~ "STAFFAN.KRONWALL",
+        player_name == "STEVEN.REINPRECHT" ~ "STEVE.REINPRECHT",
+        player_name == "TJ.GALIARDI" ~ "T.J..GALIARDI",
+        player_name == "TJ.HENSICK" ~ "T.J..HENSICK",
+        player_name %in% c("TJ.OSHIE", "T.J.OSHIE") ~ "T.J..OSHIE", 
+        player_name == "TOBY.ENSTROM" ~ "TOBIAS.ENSTROM", 
+        player_name == "TOMMY.SESTITO" ~ "TOM.SESTITO",
+        player_name == "VACLAV.PROSPAL" ~ "VINNY.PROSPAL",
+        player_name == "VINCENT.HINOSTROZA" ~ "VINNIE.HINOSTROZA",
+        player_name == "WILLIAM.THOMAS" ~ "BILL.THOMAS",
+        player_name == "ZACHARY.ASTON-REESE" ~ "ZACH.ASTON-REESE",
+        player_name == "ZACHARY.SANFORD" ~ "ZACH.SANFORD",
+        player_name == "ZACHERY.STORTINI" ~ "ZACK.STORTINI",
+        
+        ## NEW CHANGES
+        player_name == "MATTHEW.MURRAY" ~ "MATT.MURRAY",
+        player_name == "J-SEBASTIEN.AUBIN" ~ "JEAN-SEBASTIEN.AUBIN",
+        player_name %in% c("J.F..BERUBE", "JEAN-FRANCOIS.BERUBE") ~ "J-F.BERUBE", 
+        player_name == "JEFF.DROUIN-DESLAURIERS" ~ "JEFF.DESLAURIERS", 
+        player_name == "NICHOLAS.BAPTISTE" ~ "NICK.BAPTISTE",
+        player_name == "OLAF.KOLZIG" ~ "OLIE.KOLZIG",
+        player_name == "STEPHEN.VALIQUETTE" ~ "STEVE.VALIQUETTE",
+        player_name == "THOMAS.MCCOLLUM" ~ "TOM.MCCOLLUM",
+        player_name == "TIMOTHY JR..THOMAS" ~ "TIM.THOMAS",
+        ## '19-20
+        player_name == "TIM.GETTINGER" ~ "TIMOTHY.GETTINGER",
+        
+        ## Testing
+        player_name == "NICHOLAS.SHORE" ~ "NICK.SHORE",
+        player_name == "T.J..TYNAN" ~ "TJ.TYNAN",
+        
+        ## '20-21
+        player_name == "EGOR.SHARANGOVICH" ~ "YEGOR.SHARANGOVICH",
+        player_name == "ALEXIS.LAFRENI?RE" ~ "ALEXIS.LAFRENIÈRE",
+        player_name == "ALEXIS.LAFRENIERE" ~ "ALEXIS.LAFRENIÈRE",
+        player_name == "CALLAN.FOOTE" ~ "CAL.FOOTE",
+        
+        TRUE ~ player_name
+        )
+      ) %>% 
+    data.frame()
+  
+  ## Replace original column with newly created column 
+  fixed_names_df[[col_name]] <- fixed_names_df$player_name
+  
+  ## Return data
+  return(
+    fixed_names_df %>% 
+      select(-player_name)
+    )
+  
+  }
+
 ## Fix Player Names - API
 sc.update_names_API <- function(data, col_name) { 
   
@@ -4137,6 +4138,12 @@ sc.update_names_API <- function(data, col_name) {
         player_name == "THOMAS.DI.PAULI" ~ "THOMAS.DI PAULI", 
         player_name == "NICHOLAS.SHORE" ~ "NICK.SHORE",
         player_name == "T.J..TYNAN" ~ "TJ.TYNAN",
+        
+        ## '20-21 CHANGES (from HTM update function)
+        player_name == "EGOR.SHARANGOVICH" ~ "YEGOR.SHARANGOVICH",
+        player_name == "ALEXIS.LAFRENI?RE" ~ "ALEXIS.LAFRENIÈRE",
+        player_name == "ALEXIS.LAFRENIERE" ~ "ALEXIS.LAFRENIÈRE",
+        player_name == "CALLAN.FOOTE" ~ "CAL.FOOTE",
         
         ## Duplicate player names
         player_name == "SEBASTIAN.AHO" & birthday == "1996-02-17" ~ "SEBASTIAN.AHO2",     ## D, ID 8480222
