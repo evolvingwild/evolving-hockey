@@ -2,7 +2,7 @@
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/evolvingwild/evolving-hockey/commits/master)
 [![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
 
-## Scripts for <a href="https://evolving-hockey.com/" target="_blank">Evolving-Hockey.com</a>
+## Scraper for <a href="https://evolving-hockey.com/" target="_blank">Evolving-Hockey.com</a>
 
 ##### Note - if you use this scraper for any project, etc. we would love to be cited! All feedback is very helpful.
 
