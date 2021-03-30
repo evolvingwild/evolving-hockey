@@ -1755,7 +1755,7 @@ sc.shifts_parse <- function(game_id_fun, season_id_fun, shifts_list, roster_data
       season =    game_info_data$season, 
       session =   game_info_data$session,
       Team =      event_team, 
-      Opponent =  ifelse(Team == game_info_data$home_team, game_info_data$home_team, game_info_data$away_team), 
+      Opponent =  ifelse(Team == game_info_data$home_team, game_info_data$away_team, game_info_data$home_team),
       is_home =   1 * (Team == game_info_data$home_team)
       ) %>% 
     left_join(
