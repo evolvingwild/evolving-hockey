@@ -4053,6 +4053,7 @@ sc.update_names_HTM <- function(data, col_name) {
         player_name == "ALEXIS.LAFRENI?RE" ~ "ALEXIS.LAFRENIÈRE",
         player_name == "ALEXIS.LAFRENIERE" ~ "ALEXIS.LAFRENIÈRE",
         player_name == "CALLAN.FOOTE" ~ "CAL.FOOTE",
+        player_name == "MATTIAS.JANMARK-NYLEN" ~ "MATTIAS.JANMARK",
         
         TRUE ~ player_name
         )
