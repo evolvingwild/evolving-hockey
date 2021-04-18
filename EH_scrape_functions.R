@@ -4056,6 +4056,7 @@ sc.update_names_HTM <- function(data, col_name) {
         player_name == "EGOR.SHARANGOVICH" ~ "YEGOR.SHARANGOVICH",
         player_name == "CALLAN.FOOTE" ~ "CAL.FOOTE",
         player_name == "MATTIAS.JANMARK-NYLEN" ~ "MATTIAS.JANMARK",
+        player_name == "JOSH.DUNNE" ~ "JOSHUA.DUNNE",
         
         TRUE ~ player_name
         )
@@ -4143,9 +4144,11 @@ sc.update_names_API <- function(data, col_name) {
         player_name == "T.J..TYNAN" ~ "TJ.TYNAN",
         
         ## '20-21 CHANGES (from HTM update function)
-        player_name == "EGOR.SHARANGOVICH" ~ "YEGOR.SHARANGOVICH",
         player_name == "ALEXIS.LAFRENI?RE" ~ "ALEXIS.LAFRENIÈRE",
         player_name == "ALEXIS.LAFRENIERE" ~ "ALEXIS.LAFRENIÈRE",
+        player_name == "TIM.STUTZLE" ~ "TIM.STÜTZLE",
+        player_name == "TIM.ST?TZLE" ~ "TIM.STÜTZLE",
+        player_name == "EGOR.SHARANGOVICH" ~ "YEGOR.SHARANGOVICH",
         player_name == "CALLAN.FOOTE" ~ "CAL.FOOTE",
         player_name == "JOSH.DUNNE" ~ "JOSHUA.DUNNE",
         
